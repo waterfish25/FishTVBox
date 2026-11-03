@@ -3546,3 +3546,1045 @@ body.tv *::-webkit-scrollbar-track {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ============================================================
+   主页第二版：应用卡 + 扫码遥控 + 全屏直播 + B 站应用
+   ============================================================ */
+body.tv .launcher {
+  grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.95fr) minmax(178px, 0.92fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+body.tv .iptv-panel {
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+
+body.tv .movies-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+body.tv .apps-panel {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+body.tv .remote-panel {
+  grid-column: 3;
+  grid-row: 1 / 3;
+}
+
+body.tv .apps-panel {
+  color: #eaf4ff;
+  border-color: rgba(255, 255, 255, 0.68);
+  background:
+    radial-gradient(240px 180px at 88% -8%, rgba(255, 138, 180, 0.2), transparent 70%),
+    linear-gradient(165deg, #182b52 0%, #0d1c3a 58%, #081529 100%);
+}
+
+body.tv .app-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 9px 12px 12px;
+}
+
+body.tv .app-grid .app-tile {
+  gap: 2px;
+  padding: 6px;
+  border-radius: 14px;
+  border-width: 1px;
+  box-shadow: 0 10px 22px rgba(4, 16, 40, 0.3);
+}
+
+body.tv .app-grid .app-icon {
+  width: 34px;
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(10, 24, 60, 0.28);
+}
+
+body.tv .app-grid .app-name {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+body.tv .app-grid .app-sub {
+  font-size: 8.5px;
+}
+
+body.tv .tile-bili {
+  background: linear-gradient(150deg, #ff9ec4 0%, #fb4f92 58%, #e6357d 100%);
+}
+
+body.tv .tile-bili .app-icon {
+  color: #e6357d;
+}
+
+body.tv .tile-search {
+  background: linear-gradient(150deg, #ffcc6b 0%, #ff9425 60%, #f47710 100%);
+}
+
+body.tv .tile-search .app-icon {
+  color: #ef7a12;
+}
+
+body.tv .tile-settings {
+  background: linear-gradient(150deg, #b99dff 0%, #7d5cff 58%, #5a3ce0 100%);
+}
+
+body.tv .tile-remote {
+  background: linear-gradient(150deg, #66dbff 0%, #2f8dff 58%, #1c67dd 100%);
+}
+
+/* 扫码遥控卡 */
+body.tv .remote-panel {
+  color: #17304f;
+  border-color: rgba(255, 255, 255, 0.9);
+  background:
+    radial-gradient(220px 180px at 82% 0%, rgba(120, 190, 255, 0.35), transparent 70%),
+    linear-gradient(180deg, #ffffff 0%, #eff7ff 62%, #e2f1ff 100%);
+}
+
+body.tv .remote-panel .panel-head {
+  border-bottom: 1px solid rgba(47, 126, 216, 0.12);
+}
+
+body.tv .remote-panel .panel-title h2 {
+  color: #183a62;
+}
+
+body.tv .remote-panel .section-mark {
+  background: linear-gradient(180deg, #5aa9ff, rgba(90, 169, 255, 0.2));
+}
+
+body.tv .qr-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 12px 12px;
+  text-align: center;
+}
+
+body.tv .qr-box {
+  width: min(58%, 156px);
+  aspect-ratio: 1;
+  padding: 8px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid rgba(47, 126, 216, 0.16);
+  box-shadow: 0 12px 26px rgba(31, 98, 180, 0.18);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+body.tv .qr-box svg,
+body.tv .qr-box img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+body.tv .qr-box .qr-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #7fa3c8;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+body.tv .qr-title {
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 750;
+  color: #173a62;
+}
+
+body.tv .qr-url {
+  max-width: 100%;
+  font-size: 9.5px;
+  color: #5d83aa;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.tv .qr-conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: #e8f7ee;
+  color: #1f8f5f;
+  font-size: 9.5px;
+}
+
+body.tv .qr-conn i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #22b678;
+  box-shadow: 0 0 6px rgba(34, 182, 120, 0.7);
+}
+
+body.tv .qr-conn.bad {
+  background: #ffeeee;
+  color: #c94a55;
+}
+
+body.tv .qr-conn.bad i {
+  background: #f0525f;
+}
+
+body.tv .qr-hint {
+  font-size: 9px;
+  line-height: 1.55;
+  color: #7d9ab8;
+}
+
+/* 全屏直播 */
+body.tv .live-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: #000;
+  overflow: hidden;
+}
+
+body.tv .live-fullscreen video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #000;
+}
+
+body.tv .fs-top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 30px 46px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.78), transparent);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+body.tv .fs-copy {
+  min-width: 0;
+}
+
+body.tv .fs-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.7);
+}
+
+body.tv .fs-program {
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(220, 235, 255, 0.8);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
+body.tv .fs-clock {
+  margin-left: auto;
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  font-variant-numeric: tabular-nums;
+}
+
+body.tv .fs-hints {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  max-width: 88vw;
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(6, 12, 24, 0.62);
+  color: rgba(226, 238, 252, 0.78);
+  font-size: 11px;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  transition: opacity 0.3s ease;
+}
+
+body.tv .live-fullscreen.is-dim .fs-top,
+body.tv .live-fullscreen.is-dim .fs-hints {
+  opacity: 0;
+}
+
+body.tv .fs-osd {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 118px;
+  padding: 18px 28px;
+  border-radius: 16px;
+  background: rgba(5, 12, 26, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 30px;
+  font-weight: 800;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+body.tv .fs-osd small {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(226, 238, 252, 0.7);
+}
+
+body.tv .channel-switcher {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 26px 34px 30px;
+  background: linear-gradient(180deg, rgba(4, 10, 24, 0.9), rgba(4, 10, 24, 0.78));
+  backdrop-filter: blur(10px);
+}
+
+body.tv .cs-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+body.tv .cs-head h3 {
+  font-size: 22px;
+  font-weight: 750;
+  color: #fff;
+}
+
+body.tv .cs-head span {
+  font-size: 11px;
+  color: rgba(200, 219, 240, 0.6);
+}
+
+body.tv .cs-grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
+  align-content: start;
+  padding: 2px;
+}
+
+body.tv .cs-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  height: 58px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  text-align: left;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+body.tv .cs-item:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+
+body.tv .cs-item.is-active {
+  border-color: rgba(255, 208, 120, 0.8);
+  background: rgba(255, 196, 107, 0.16);
+}
+
+body.tv .cs-num {
+  flex: none;
+  width: 34px;
+  height: 24px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffd48c;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+body.tv .cs-logo {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffd48c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+body.tv .cs-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+body.tv .cs-name {
+  min-width: 0;
+  font-size: 12.5px;
+  color: #e8f2ff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* B 站应用 */
+body.tv .bili-view {
+  position: fixed;
+  inset: 0;
+  z-index: 46;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 26px 24px;
+  background:
+    radial-gradient(700px 380px at 88% -10%, rgba(255, 96, 156, 0.22), transparent 68%),
+    linear-gradient(160deg, #131a2c 0%, #0a1020 60%, #070b16 100%);
+  color: #eaf4ff;
+}
+
+body.tv .app-view-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+body.tv .app-view-title {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+body.tv .bili-mark {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(150deg, #ff8fb6, #f0457f);
+  color: #fff;
+  font-size: 21px;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(240, 69, 127, 0.35);
+}
+
+body.tv .app-view-title h2 {
+  font-size: 21px;
+  font-weight: 750;
+}
+
+body.tv .app-view-title p {
+  margin-top: 2px;
+  font-size: 10.5px;
+  color: rgba(196, 216, 240, 0.6);
+}
+
+body.tv .app-view-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+body.tv .bili-grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  padding: 2px;
+  align-content: start;
+}
+
+body.tv .bili-grid .short-card {
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+body.tv .bili-grid .short-title {
+  font-size: 12.5px;
+  min-height: 34px;
+}
+
+body.tv .bili-grid .short-owner {
+  font-size: 10px;
+}
+
+@media (max-height: 760px) {
+  body.tv .app-grid .app-sub {
+    display: none;
+  }
+  body.tv .app-grid .app-icon {
+    width: 30px;
+  }
+  body.tv .qr-box {
+    width: min(52%, 128px);
+  }
+  body.tv .qr-hint {
+    display: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  body.tv .launcher {
+    grid-template-columns: minmax(0, 1.9fr) minmax(0, 1.7fr) minmax(150px, 0.8fr);
+  }
+  body.tv .app-grid .app-sub {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  body.tv .launcher {
+    grid-template-rows: auto auto auto;
+  }
+  body.tv .apps-panel {
+    min-height: 300px;
+  }
+  body.tv .remote-panel {
+    min-height: 330px;
+  }
+  body.tv .qr-box {
+    width: 180px;
+  }
+  body.tv .fs-hints {
+    display: none;
+  }
+  body.tv .apps-panel,
+  body.tv .remote-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+/* ============================================================
+   手机遥控：参考竖屏遥控器布局
+   ============================================================ */
+body.remote {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(420px 260px at 12% -8%, rgba(255, 255, 255, 0.9), transparent 62%),
+    radial-gradient(360px 240px at 92% 8%, rgba(188, 213, 245, 0.55), transparent 66%),
+    linear-gradient(180deg, #f2f6fb 0%, #e8eef7 100%);
+  color: #26364d;
+}
+
+body.remote::before {
+  display: none;
+}
+
+body.remote .r-app {
+  width: min(100%, 460px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0 10px;
+}
+
+body.remote .r-head {
+  flex: 0 0 46px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+}
+
+body.remote .r-head h1 {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c3a4f;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+body.remote .r-circle {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(64, 88, 120, 0.08);
+  background: rgba(255, 255, 255, 0.86);
+  color: #6d7d92;
+  font-size: 14px;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(38, 62, 96, 0.08);
+}
+
+body.remote .r-head-actions {
+  display: flex;
+  gap: 6px;
+}
+
+body.remote .r-chip {
+  flex: none;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  margin-top: 2px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(53, 113, 200, 0.14);
+  background: rgba(255, 255, 255, 0.86);
+  color: #5f7f9f;
+  font-size: 10.5px;
+  box-shadow: 0 3px 8px rgba(38, 62, 96, 0.06);
+}
+
+body.remote .r-chip i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f0a03c;
+  box-shadow: 0 0 6px rgba(240, 160, 60, 0.65);
+}
+
+body.remote .r-chip.on i {
+  background: #22b678;
+  box-shadow: 0 0 6px rgba(34, 182, 120, 0.65);
+}
+
+body.remote .r-chip.off i {
+  background: #f0525f;
+  box-shadow: 0 0 6px rgba(240, 82, 95, 0.6);
+}
+
+body.remote .r-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 58px;
+  grid-template-rows: 52px 54px minmax(150px, 1fr) auto auto auto;
+  gap: 9px 12px;
+  align-content: center;
+  padding: 8px 16px 6px;
+}
+
+/* 顶部三个功能键 */
+body.remote .r-func {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(64, 88, 120, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  color: #56677d;
+  box-shadow: 0 6px 14px rgba(38, 62, 96, 0.1);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+body.remote .r-func svg {
+  width: 19px;
+  height: 19px;
+}
+
+body.remote .r-func:active {
+  transform: scale(0.94);
+  box-shadow: 0 3px 8px rgba(38, 62, 96, 0.12);
+}
+
+body.remote .r-power {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  color: #e05a5f;
+}
+
+body.remote .r-gear {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  align-self: center;
+}
+
+body.remote .r-mute {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+}
+
+/* 音量 / 频道 竖条 */
+body.remote .r-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-radius: 29px;
+  border: 1px solid rgba(64, 88, 120, 0.09);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 20px rgba(38, 62, 96, 0.1);
+}
+
+body.remote .r-volume {
+  grid-column: 1;
+  grid-row: 2 / 5;
+}
+
+body.remote .r-channel {
+  grid-column: 3;
+  grid-row: 2 / 5;
+}
+
+body.remote .r-pill button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: #4c5c72;
+  font-size: 20px;
+  font-weight: 500;
+  display: grid;
+  place-items: center;
+}
+
+body.remote .r-pill button:active {
+  background: #e8f0fb;
+}
+
+body.remote .r-pill span {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #8a9bb0;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+
+/* 数字键盘入口 */
+body.remote .r-keypad {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: center;
+  align-self: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(64, 88, 120, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  color: #56677d;
+  box-shadow: 0 6px 14px rgba(38, 62, 96, 0.1);
+}
+
+body.remote .r-keypad svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* 方向键 */
+body.remote .r-dpad {
+  position: relative;
+  grid-column: 2;
+  grid-row: 3 / 5;
+  width: min(100%, 286px);
+  max-height: 100%;
+  aspect-ratio: 1;
+  justify-self: center;
+  align-self: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(120% 120% at 30% 20%, #ffffff 0%, #f4f7fb 52%, #dde4ee 100%);
+  border: 1px solid rgba(64, 88, 120, 0.12);
+  box-shadow:
+    0 20px 38px rgba(38, 62, 96, 0.16),
+    inset 0 2px 2px rgba(255, 255, 255, 0.9),
+    inset 0 -8px 18px rgba(70, 92, 126, 0.08);
+}
+
+body.remote .r-dpad button {
+  position: absolute;
+  width: 25%;
+  height: 25%;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: #7d8ea4;
+  font-size: 17px;
+  display: grid;
+  place-items: center;
+}
+
+body.remote .r-dpad button:active {
+  background: rgba(47, 128, 237, 0.08);
+}
+
+body.remote .r-up {
+  left: 37.5%;
+  top: 4%;
+}
+
+body.remote .r-down {
+  left: 37.5%;
+  bottom: 4%;
+}
+
+body.remote .r-left {
+  left: 4%;
+  top: 37.5%;
+}
+
+body.remote .r-right {
+  right: 4%;
+  top: 37.5%;
+}
+
+body.remote .r-ok {
+  left: 31%;
+  top: 31%;
+  width: 38% !important;
+  height: 38% !important;
+  border-radius: 50% !important;
+  background: linear-gradient(150deg, #ffffff, #e9eef6) !important;
+  border: 1px solid rgba(64, 88, 120, 0.12) !important;
+  color: #45566c !important;
+  font-size: 17px !important;
+  font-weight: 700;
+  letter-spacing: 1px;
+  box-shadow: 0 8px 18px rgba(38, 62, 96, 0.14), inset 0 2px 2px #fff;
+}
+
+/* 底部三键 */
+body.remote .r-bottom {
+  grid-column: 1 / 4;
+  grid-row: 5;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 18px;
+  border: 1px solid rgba(64, 88, 120, 0.09);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 24px rgba(38, 62, 96, 0.1);
+}
+
+body.remote .r-bottom button {
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #56677d;
+  font-size: 10px;
+}
+
+body.remote .r-bottom .r-bico {
+  font-size: 16px;
+  line-height: 1;
+}
+
+body.remote .r-bottom button.is-main {
+  background: linear-gradient(150deg, #5ea9ff, #2f80ed);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(47, 128, 237, 0.28);
+}
+
+/* 搜索 */
+body.remote .r-search {
+  grid-column: 1 / 4;
+  grid-row: 6;
+  display: flex;
+  gap: 8px;
+  padding: 7px 8px 7px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(64, 88, 120, 0.09);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 20px rgba(38, 62, 96, 0.08);
+}
+
+body.remote .r-search input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  color: #253850;
+  font-size: 12.5px;
+  outline: none;
+}
+
+body.remote .r-search input::placeholder {
+  color: #9aaabd;
+}
+
+body.remote .r-search button {
+  flex: none;
+  height: 32px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 9px;
+  background: #2f80ed;
+  color: #fff;
+  font-size: 12px;
+}
+
+body.remote .r-tip {
+  grid-column: 1 / 4;
+  grid-row: 7;
+  margin: 2px 4px 0;
+  font-size: 9.5px;
+  line-height: 1.5;
+  color: #8a9bb0;
+  text-align: center;
+}
+
+body.remote .r-tip b {
+  color: #4a7fbe;
+  font-weight: 500;
+}
+
+/* 数字键盘浮层 */
+body.remote .r-numpad {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 30;
+  width: min(88vw, 340px);
+  transform: translateX(-50%);
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(64, 88, 120, 0.12);
+  box-shadow: 0 26px 60px rgba(24, 46, 84, 0.32);
+  backdrop-filter: blur(14px);
+}
+
+body.remote .r-numpad-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+body.remote .r-numpad-head strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2f4058;
+}
+
+body.remote .r-numpad-head button {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: #eef2f8;
+  color: #6d7d92;
+}
+
+body.remote .r-numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+body.remote .r-numpad-grid button {
+  height: 46px;
+  border: 1px solid rgba(64, 88, 120, 0.09);
+  border-radius: 12px;
+  background: #f7f9fc;
+  color: #33465f;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+body.remote .r-numpad-grid button:active {
+  background: #e7f0fd;
+}
+
+body.remote .r-numpad-tip {
+  margin-top: 9px;
+  font-size: 9.5px;
+  color: #8a9bb0;
+  text-align: center;
+}
+
+body.remote .remote-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 84px;
+  transform: translateX(-50%);
+  z-index: 60;
+  padding: 9px 15px;
+  border-radius: 10px;
+  background: rgba(37, 56, 84, 0.92);
+  color: #fff;
+  font-size: 12px;
+  box-shadow: 0 14px 34px rgba(18, 38, 72, 0.3);
+}
+
+body.remote .remote-toast.bad {
+  background: rgba(168, 48, 58, 0.94);
+}
+
+@media (max-height: 700px) {
+  body.remote .r-body {
+    grid-template-rows: 44px 46px minmax(120px, 1fr) auto auto auto;
+    gap: 7px 10px;
+    padding-top: 4px;
+  }
+  body.remote .r-dpad {
+    width: min(100%, 230px);
+  }
+  body.remote .r-pill button {
+    height: 36px;
+  }
+  body.remote .r-tip {
+    display: none;
+  }
+}

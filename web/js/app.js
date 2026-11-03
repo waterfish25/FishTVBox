@@ -44,6 +44,25 @@
     remoteUrl: $('#remoteUrl'),
     sourceFooter: $('#sourceFooter'),
     connState: $('#connState'),
+    qrCode: $('#qrCode'),
+    qrUrl: $('#qrUrl'),
+    qrConn: $('#qrConn'),
+    liveFullscreen: $('#liveFullscreen'),
+    fsVideo: $('#fsVideo'),
+    fsBadge: $('#fsBadge'),
+    fsTitle: $('#fsTitle'),
+    fsProgram: $('#fsProgram'),
+    fsClock: $('#fsClock'),
+    fsOsd: $('#fsOsd'),
+    fsHints: $('#fsHints'),
+    channelSwitcher: $('#channelSwitcher'),
+    channelSwitcherGrid: $('#channelSwitcherGrid'),
+    csMeta: $('#csMeta'),
+    biliView: $('#biliView'),
+    biliAppTile: $('#biliAppTile'),
+    btnBiliRefresh: $('#btnBiliRefresh'),
+    btnBiliHome: $('#btnBiliHome'),
+    btnShortsEmptyRefresh: $('#btnShortsEmptyRefresh'),
     overlay: $('#overlay'),
     overlayBody: $('#overlayBody'),
     overlayClose: $('#overlayClose'),
@@ -72,6 +91,14 @@
     lastFocus: null,
     tvHls: null,
     modalHls: null,
+    fsHls: null,
+    fullscreenOpen: false,
+    channelSwitchOpen: false,
+    biliOpen: false,
+    digitBuffer: '',
+    digitTimer: null,
+    osdTimer: null,
+    dimTimer: null,
     toastTimer: null,
     lastSearch: '',
     initialFocus: false,
@@ -158,6 +185,8 @@
 
   function navScope() {
     if (state.playerOpen) return el.playerModal;
+    if (state.fullscreenOpen) return el.liveFullscreen;
+    if (state.biliOpen) return el.biliView;
     if (state.overlayOpen) return el.overlayCard;
     return document;
   }
@@ -370,7 +399,10 @@
       button.innerHTML = `<span class="ch-logo">${logo}</span><span class="ch-name">${esc(channel.name)}</span>`;
       const img = button.querySelector('img');
       if (img) img.addEventListener('error', () => img.remove());
-      button.addEventListener('click', () => selectChannel(channel, { play: true }));
+      button.addEventListener('click', () => {
+        selectChannel(channel, { play: false });
+        openLiveFullscreen();
+      });
       el.channelGrid.appendChild(button);
     }
   }
@@ -479,7 +511,7 @@
   }
 
   function destroyHls(which) {
-    const key = which === 'modal' ? 'modalHls' : 'tvHls';
+    const key = which === 'modal' ? 'modalHls' : which === 'fs' ? 'fsHls' : 'tvHls';
     if (state[key]) {
       try {
         state[key].destroy();
@@ -509,7 +541,7 @@
 
   function loadMedia(video, rawUrl, which) {
     destroyHls(which);
-    const hlsKey = which === 'modal' ? 'modalHls' : 'tvHls';
+    const hlsKey = which === 'modal' ? 'modalHls' : which === 'fs' ? 'fsHls' : 'tvHls';
     const url = proxied(rawUrl);
     const cleanPath = rawUrl.split('?')[0].toLowerCase();
     const looksHls = cleanPath.endsWith('.m3u8') || rawUrl.includes('.m3u8');
@@ -654,17 +686,23 @@
     updatePlayLabel();
   }
 
+  function activeVideo() {
+    if (state.playerOpen) return el.modalVideo;
+    if (state.fullscreenOpen) return el.fsVideo;
+    return el.tvVideo;
+  }
+
   function updatePlayLabel() {
-    const video = state.playerOpen ? el.modalVideo : el.tvVideo;
+    const video = activeVideo();
     el.btnPlay.textContent = video && !video.paused ? '暂停' : '播放';
   }
 
   function updateMuteLabel() {
-    const video = state.playerOpen ? el.modalVideo : el.tvVideo;
+    const video = activeVideo();
     el.btnMute.textContent = video?.muted ? '取消静音' : '静音';
   }
 
-  function toggleMute(video = state.playerOpen ? el.modalVideo : el.tvVideo) {
+  function toggleMute(video = activeVideo()) {
     if (!video) return;
     video.muted = !video.muted;
     updateMuteLabel();
@@ -672,11 +710,13 @@
   }
 
   function changeVolume(delta) {
-    const video = state.playerOpen ? el.modalVideo : el.tvVideo;
+    const video = activeVideo();
     if (!video) return;
     video.muted = false;
     video.volume = Math.min(1, Math.max(0, video.volume + delta));
-    toast(`音量 ${Math.round(video.volume * 100)}%`);
+    const percent = Math.round(video.volume * 100);
+    if (state.fullscreenOpen) showOsd(`${percent}%`, '音量');
+    else toast(`音量 ${percent}%`);
   }
 
   async function toggleFullscreen() {
@@ -696,6 +736,207 @@
     selectChannel(next, { play: true });
     const node = $$('.channel-card', el.channelGrid).find((item) => item.dataset.channelId === next.id);
     if (node) focusNode(node);
+  }
+
+  /* ---------------- fullscreen live / apps ---------------- */
+
+  function channelNumber(channel) {
+    const list = state.live?.channels || [];
+    const index = list.findIndex((item) => item.id === channel?.id);
+    return index >= 0 ? index + 1 : 0;
+  }
+
+  function showOsd(main, sub = '', timeout = 1600) {
+    if (!el.fsOsd) return;
+    el.fsOsd.innerHTML = `${esc(main)}${sub ? `<small>${esc(sub)}</small>` : ''}`;
+    el.fsOsd.hidden = false;
+    clearTimeout(state.osdTimer);
+    state.osdTimer = setTimeout(() => { el.fsOsd.hidden = true; }, timeout);
+  }
+
+  function resetFullscreenDim() {
+    if (!el.liveFullscreen) return;
+    el.liveFullscreen.classList.remove('is-dim');
+    clearTimeout(state.dimTimer);
+    state.dimTimer = setTimeout(() => {
+      if (state.fullscreenOpen && !state.channelSwitchOpen) el.liveFullscreen.classList.add('is-dim');
+    }, 4200);
+  }
+
+  function updateFullscreenInfo(programTitle) {
+    const channel = state.currentChannel;
+    if (!channel) return;
+    const isCatchup = state.activeProgram >= 0;
+    el.fsBadge.textContent = isCatchup ? '回看' : 'LIVE';
+    el.fsBadge.className = isCatchup ? 'now-badge catchup' : 'now-badge';
+    el.fsTitle.textContent = channel.name;
+    el.fsProgram.textContent = programTitle || (isCatchup ? '今日回看' : '正在直播');
+    el.fsClock.textContent = formatClock(new Date());
+  }
+
+  function openLiveFullscreen() {
+    if (!state.live?.channels?.length) {
+      toast('还没有可用频道，请先刷新直播源', true);
+      return;
+    }
+    if (!state.currentChannel) state.currentChannel = state.live.channels[0];
+    state.fullscreenOpen = true;
+    state.channelSwitchOpen = false;
+    el.liveFullscreen.hidden = false;
+    el.channelSwitcher.hidden = true;
+    el.liveFullscreen.classList.remove('is-dim');
+    el.tvVideo.pause();
+    updateFullscreenInfo();
+    loadMedia(el.fsVideo, state.currentChannel.url, 'fs');
+    const num = String(channelNumber(state.currentChannel)).padStart(3, '0');
+    showOsd(num, state.currentChannel.name, 2200);
+    resetFullscreenDim();
+  }
+
+  function closeLiveFullscreen() {
+    if (!state.fullscreenOpen) return;
+    state.fullscreenOpen = false;
+    state.channelSwitchOpen = false;
+    el.liveFullscreen.hidden = true;
+    el.liveFullscreen.classList.remove('is-dim');
+    el.channelSwitcher.hidden = true;
+    clearTimeout(state.osdTimer);
+    clearTimeout(state.dimTimer);
+    el.fsOsd.hidden = true;
+    destroyHls('fs');
+    el.fsVideo.pause();
+    el.fsVideo.removeAttribute('src');
+    el.fsVideo.load();
+    if (state.currentChannel) {
+      playLive(state.currentChannel);
+    } else {
+      focusFirstChannel();
+    }
+  }
+
+  function renderChannelSwitcher() {
+    const channels = state.live?.channels || [];
+    el.channelSwitcherGrid.innerHTML = '';
+    channels.forEach((channel, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `cs-item${channel.id === state.currentChannel?.id ? ' is-active' : ''}`;
+      button.dataset.nav = '';
+      button.dataset.channelId = channel.id;
+      const logo = channel.logo
+        ? `<img src="${esc(imageUrl(channel.logo))}" alt="" loading="lazy" onerror="this.remove()">`
+        : esc(channel.name.slice(0, 1));
+      button.innerHTML = `
+        <span class="cs-num">${String(index + 1).padStart(3, '0')}</span>
+        <span class="cs-logo">${logo}</span>
+        <span class="cs-name">${esc(channel.name)}</span>
+      `;
+      button.addEventListener('click', () => switchFullscreenChannel(channel));
+      el.channelSwitcherGrid.appendChild(button);
+    });
+    el.csMeta.textContent = `${channels.length} 个频道 · 方向键选择 · OK 播放 · 返回键收起`;
+  }
+
+  function openChannelSwitcher() {
+    if (!state.fullscreenOpen) return;
+    if (!state.live?.channels?.length) {
+      showOsd('—', '暂无频道', 1200);
+      return;
+    }
+    state.channelSwitchOpen = true;
+    el.channelSwitcher.hidden = false;
+    el.liveFullscreen.classList.remove('is-dim');
+    clearTimeout(state.dimTimer);
+    renderChannelSwitcher();
+    const active = $('.cs-item.is-active', el.channelSwitcherGrid) || $('.cs-item', el.channelSwitcherGrid);
+    if (active) focusNode(active);
+  }
+
+  function closeChannelSwitcher() {
+    state.channelSwitchOpen = false;
+    el.channelSwitcher.hidden = true;
+    resetFullscreenDim();
+  }
+
+  function switchFullscreenChannel(channel, keepSwitcher = false) {
+    if (!channel) return;
+    selectChannel(channel, { play: false });
+    state.digitBuffer = '';
+    clearTimeout(state.digitTimer);
+    updateFullscreenInfo();
+    loadMedia(el.fsVideo, channel.url, 'fs');
+    showOsd(String(channelNumber(channel)).padStart(3, '0'), channel.name, 2200);
+    if (!keepSwitcher) closeChannelSwitcher();
+    resetFullscreenDim();
+  }
+
+  function stepFullscreenChannel(delta) {
+    const list = state.live?.channels || [];
+    if (!list.length) return;
+    const index = Math.max(0, list.findIndex((channel) => channel.id === state.currentChannel?.id));
+    const next = list[(index + delta + list.length) % list.length];
+    switchFullscreenChannel(next);
+  }
+
+  function switchToChannelNumber(number) {
+    const list = state.live?.channels || [];
+    const channel = list[number - 1];
+    if (!channel) {
+      showOsd(String(number), '未找到该频道', 1600);
+      return false;
+    }
+    switchFullscreenChannel(channel);
+    return true;
+  }
+
+  function handleChannelDigit(digit) {
+    if (!state.fullscreenOpen) return false;
+    state.digitBuffer = `${state.digitBuffer}${digit}`.slice(-3);
+    clearTimeout(state.digitTimer);
+    showOsd(state.digitBuffer, '输入频道号', 1400);
+    state.digitTimer = setTimeout(() => {
+      const number = Number(state.digitBuffer);
+      state.digitBuffer = '';
+      if (number) switchToChannelNumber(number);
+    }, 1500);
+    return true;
+  }
+
+  function openBiliView() {
+    state.biliOpen = true;
+    el.biliView.hidden = false;
+    if (!el.shortGrid.children.length) loadShorts();
+    const first = $('.short-card', el.shortGrid);
+    if (first) focusNode(first);
+    else focusNode($('#btnBiliHome'));
+  }
+
+  function closeBiliView() {
+    if (!state.biliOpen) return;
+    state.biliOpen = false;
+    el.biliView.hidden = true;
+    focusNode(el.biliAppTile);
+  }
+
+  function renderQrCode() {
+    if (!el.qrCode) return;
+    const base = state.info?.addresses?.find((address) => !address.includes('127.0.0.1'))
+      || state.info?.addresses?.[0]
+      || location.origin;
+    const url = `${base}${state.info?.remote || '/remote'}`;
+    el.qrUrl.textContent = url;
+    if (typeof qrcode !== 'function') {
+      el.qrCode.innerHTML = '<span class="qr-placeholder">二维码组件未加载<br>请直接访问 /remote</span>';
+      return;
+    }
+    try {
+      const qr = qrcode(0, 'M');
+      qr.addData(url);
+      qr.make();
+      el.qrCode.innerHTML = qr.createSvgTag({ cellSize: 3, margin: 0 });
+    } catch {
+      el.qrCode.innerHTML = '<span class="qr-placeholder">二维码生成失败<br>请直接访问 /remote</span>';
+    }
   }
 
   /* ---------------- movies ---------------- */
@@ -1102,6 +1343,12 @@
       BrowserBack: 'Escape',
       Back: 'Escape',
       back: 'Escape',
+      BrowserHome: 'Home',
+      Home: 'Home',
+      VolumeUp: 'AudioVolumeUp',
+      VolumeDown: 'AudioVolumeDown',
+      VolumeMute: 'AudioVolumeMute',
+      MediaVolumeMute: 'AudioVolumeMute',
       MediaStop: 'MediaStop',
     };
     return aliases[key] || key;
@@ -1110,6 +1357,15 @@
   function goBack() {
     if (state.playerOpen) {
       closePlayerModal();
+      return;
+    }
+    if (state.fullscreenOpen) {
+      if (state.channelSwitchOpen) closeChannelSwitcher();
+      else closeLiveFullscreen();
+      return;
+    }
+    if (state.biliOpen) {
+      closeBiliView();
       return;
     }
     if (state.overlayOpen) {
@@ -1145,6 +1401,79 @@
     }
 
     const dirMap = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+
+    if (state.fullscreenOpen) {
+      if (key === 'Home') {
+        closeLiveFullscreen();
+        return true;
+      }
+      if (state.channelSwitchOpen) {
+        if (dirMap[key]) {
+          moveFocus(dirMap[key]);
+          return true;
+        }
+        if (key === 'Enter' || key === ' ') {
+          const target = document.activeElement;
+          if (target && target.matches('.cs-item')) target.click();
+          return true;
+        }
+        if (/^[0-9]$/.test(key)) {
+          closeChannelSwitcher();
+          handleChannelDigit(key);
+          return true;
+        }
+        return true;
+      }
+      if (key === 'Enter' || key === ' ') {
+        openChannelSwitcher();
+        return true;
+      }
+      if (key === 'ArrowUp') {
+        stepFullscreenChannel(-1);
+        return true;
+      }
+      if (key === 'ArrowDown') {
+        stepFullscreenChannel(1);
+        return true;
+      }
+      if (key === 'ArrowLeft' || key === '-' || key === '_') {
+        changeVolume(-0.1);
+        return true;
+      }
+      if (key === 'ArrowRight' || key === '+' || key === '=') {
+        changeVolume(0.1);
+        return true;
+      }
+      if (/^[0-9]$/.test(key)) {
+        handleChannelDigit(key);
+        return true;
+      }
+      if (key === 'm' || key === 'M' || key === 'MediaVolumeMute') {
+        toggleMute();
+        return true;
+      }
+      resetFullscreenDim();
+      return key === 'f' || key === 'F';
+    }
+
+    if (state.biliOpen) {
+      if (key === 'Home') {
+        closeBiliView();
+        return true;
+      }
+      if (dirMap[key]) {
+        moveFocus(dirMap[key]);
+        return true;
+      }
+      if (key === 'Enter' || key === ' ') {
+        const target = document.activeElement;
+        if (target && target.matches(NAV)) target.click();
+        else focusFirst($('.short-card', el.shortGrid));
+        return true;
+      }
+      return false;
+    }
+
     if (dirMap[key]) {
       moveFocus(dirMap[key]);
       return true;
@@ -1160,11 +1489,23 @@
         return true;
       }
       if (active === el.stage) {
-        togglePlayback(el.tvVideo);
+        openLiveFullscreen();
       } else if (active && active.matches(NAV)) {
         active.click();
       } else {
         focusFirstChannel();
+      }
+      return true;
+    }
+
+    if (/^[0-9]$/.test(key) && el.stage.classList.contains('is-playing')) {
+      const list = state.live?.channels || [];
+      const channel = list[Number(key) - 1];
+      if (channel) {
+        selectChannel(channel, { play: true });
+        toast(`切换到 ${channel.name}`);
+      } else {
+        toast(`没有第 ${key} 个频道`, true);
       }
       return true;
     }
@@ -1179,11 +1520,13 @@
       return true;
     }
     if (key === 'MediaTrackNext') {
-      nextChannel(1);
+      if (state.fullscreenOpen) stepFullscreenChannel(1);
+      else nextChannel(1);
       return true;
     }
     if (key === 'MediaTrackPrevious') {
-      nextChannel(-1);
+      if (state.fullscreenOpen) stepFullscreenChannel(-1);
+      else nextChannel(-1);
       return true;
     }
     if (key === 'AudioVolumeUp') {
@@ -1209,6 +1552,8 @@
     if (key === 'Home') {
       closePlayerModal();
       closeOverlay(false);
+      if (state.fullscreenOpen) closeLiveFullscreen();
+      if (state.biliOpen) closeBiliView();
       focusFirstChannel();
       return true;
     }
@@ -1225,24 +1570,63 @@
 
     switch (command.action) {
       case 'home':
+      case 'power':
         closePlayerModal();
         closeOverlay(false);
+        if (state.fullscreenOpen) closeLiveFullscreen();
+        if (state.biliOpen) closeBiliView();
         focusFirstChannel();
         break;
       case 'live':
         closePlayerModal();
         closeOverlay(false);
+        if (state.fullscreenOpen) closeLiveFullscreen();
+        if (state.biliOpen) closeBiliView();
         focusFirstChannel();
         break;
       case 'movies':
         closePlayerModal();
         closeOverlay(false);
+        if (state.fullscreenOpen) closeLiveFullscreen();
+        if (state.biliOpen) closeBiliView();
         focusFirst($('.poster-card', el.movieGrid));
         break;
       case 'shorts':
         closePlayerModal();
         closeOverlay(false);
-        focusFirst($('.short-card', el.shortGrid));
+        if (state.fullscreenOpen) closeLiveFullscreen();
+        openBiliView();
+        break;
+      case 'apps':
+        closePlayerModal();
+        closeOverlay(false);
+        if (state.fullscreenOpen) closeLiveFullscreen();
+        openBiliView();
+        break;
+      case 'list':
+      case 'ok':
+        if (state.fullscreenOpen) {
+          if (state.channelSwitchOpen) {
+            const target = document.activeElement;
+            if (target && target.matches('.cs-item')) target.click();
+          } else {
+            openChannelSwitcher();
+          }
+        }
+        break;
+      case 'channelUp':
+        if (state.fullscreenOpen) stepFullscreenChannel(-1);
+        else nextChannel(-1);
+        break;
+      case 'channelDown':
+        if (state.fullscreenOpen) stepFullscreenChannel(1);
+        else nextChannel(1);
+        break;
+      case 'menu':
+        closePlayerModal();
+        closeOverlay(false);
+        if (state.biliOpen) closeBiliView();
+        openLiveFullscreen();
         break;
       case 'search':
         closePlayerModal();
@@ -1253,7 +1637,7 @@
         openSearchOverlay(command.text || '', Boolean(command.text));
         break;
       case 'playpause':
-        togglePlayback(state.playerOpen ? el.modalVideo : el.tvVideo);
+        togglePlayback(activeVideo());
         break;
       case 'volup':
         changeVolume(0.1);
@@ -1265,7 +1649,8 @@
         toggleMute();
         break;
       case 'fullscreen':
-        toggleFullscreen();
+        if (state.fullscreenOpen) closeLiveFullscreen();
+        else openLiveFullscreen();
         break;
       case 'settings':
         closePlayerModal();
@@ -1275,10 +1660,12 @@
         refreshAll();
         break;
       case 'next':
-        nextChannel(1);
+        if (state.fullscreenOpen) stepFullscreenChannel(1);
+        else nextChannel(1);
         break;
       case 'prev':
-        nextChannel(-1);
+        if (state.fullscreenOpen) stepFullscreenChannel(-1);
+        else nextChannel(-1);
         break;
       case 'back':
         goBack();
@@ -1295,10 +1682,14 @@
     source.addEventListener('open', () => {
       el.connState.classList.remove('bad');
       el.connState.textContent = '遥控就绪';
+      el.qrConn?.classList.remove('bad');
+      if (el.qrConn) el.qrConn.innerHTML = '<i></i>遥控服务就绪';
     });
     source.addEventListener('error', () => {
       el.connState.classList.add('bad');
       el.connState.textContent = '遥控重连中';
+      el.qrConn?.classList.add('bad');
+      if (el.qrConn) el.qrConn.innerHTML = '<i></i>遥控重连中';
     });
     source.addEventListener('remote', (event) => {
       try {
@@ -1366,7 +1757,6 @@
     $('#btnMovieRefresh').addEventListener('click', () => loadMovies(true));
     $('#btnMovieSearch').addEventListener('click', () => openSearchOverlay(''));
     $('#btnMovieEmptyGuide').addEventListener('click', openGuide);
-    $('#btnShortsRefresh').addEventListener('click', () => loadShorts(true));
     $('#btnShortsEmptyRefresh').addEventListener('click', () => loadShorts(true));
 
     const baseUrl = () => {
@@ -1374,39 +1764,16 @@
       return base;
     };
 
-    $('#tileSettings')?.addEventListener('click', openGuide);
-    $('#tileRemote')?.addEventListener('click', () => {
+    $('#biliAppTile')?.addEventListener('click', openBiliView);
+    $('#searchAppTile')?.addEventListener('click', () => openSearchOverlay(''));
+    $('#settingsAppTile')?.addEventListener('click', openGuide);
+    $('#remoteAppTile')?.addEventListener('click', () => {
       window.open(`${baseUrl()}/remote`, '_blank');
     });
-    $('#quickAll')?.addEventListener('click', () => {
-      if (!state.live) {
-        loadChannels(true);
-        return;
-      }
-      state.category = 'all';
-      renderCategories(state.live);
-      renderChannels();
-      focusFirstChannel();
-    });
-    $('#quickCatchup')?.addEventListener('click', () => {
-      const first = $('.catchup-item', el.catchupList);
-      if (first) focusNode(first);
-      else if (state.currentChannel) loadEpg(state.currentChannel);
-      else toast('先选择一个频道，再查看今日回看');
-    });
-    $('#quickMovies')?.addEventListener('click', () => {
-      const first = $('.poster-card', el.movieGrid);
-      if (first) focusNode(first);
-      else loadMovies(true);
-    });
-    $('#quickShorts')?.addEventListener('click', () => {
-      const first = $('.short-card', el.shortGrid);
-      if (first) focusNode(first);
-      else loadShorts(true);
-    });
-    $('#quickMore')?.addEventListener('click', openGuide);
+    $('#btnBiliRefresh')?.addEventListener('click', () => loadShorts(true));
+    $('#btnBiliHome')?.addEventListener('click', closeBiliView);
 
-    el.btnPlay.addEventListener('click', () => togglePlayback(state.playerOpen ? el.modalVideo : el.tvVideo));
+    el.btnPlay.addEventListener('click', () => togglePlayback(activeVideo()));
     el.btnMute.addEventListener('click', () => toggleMute());
     el.btnFullscreen.addEventListener('click', toggleFullscreen);
     el.overlayClose.addEventListener('click', () => closeOverlay());
@@ -1415,15 +1782,18 @@
 
     el.stage.addEventListener('click', (event) => {
       if (event.target.closest('button')) return;
-      if (el.stage.classList.contains('is-playing')) togglePlayback(el.tvVideo);
+      openLiveFullscreen();
     });
 
     el.tvVideo.addEventListener('volumechange', updateMuteLabel);
     el.modalVideo.addEventListener('volumechange', updateMuteLabel);
+    el.fsVideo.addEventListener('volumechange', updateMuteLabel);
     el.tvVideo.addEventListener('play', () => updatePlayLabel());
     el.tvVideo.addEventListener('pause', () => updatePlayLabel());
     el.modalVideo.addEventListener('play', () => updatePlayLabel());
     el.modalVideo.addEventListener('pause', () => updatePlayLabel());
+    el.fsVideo.addEventListener('play', () => updatePlayLabel());
+    el.fsVideo.addEventListener('pause', () => updatePlayLabel());
 
     el.catchupList.addEventListener('click', (event) => {
       if (!event.target.closest('.catchup-item')) return;
@@ -1453,6 +1823,7 @@
     try {
       await loadInfo();
       await loadConfig();
+      renderQrCode();
     } catch {
       // 继续加载内容
     }
@@ -1464,7 +1835,8 @@
       focusFirstChannel();
     }
 
-    el.catchupDate.textContent = '';
+    const now = new Date();
+    el.catchupDate.textContent = `今天 ${now.getMonth() + 1}月${now.getDate()}日`;
   }
 
   boot();

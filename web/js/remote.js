@@ -5,7 +5,9 @@
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
   const statusNode = $('#remoteStatus');
+  const chipNode = $('#remoteChip');
   const toastNode = $('#remoteToast');
+  const numPad = $('#numPad');
   let toastTimer = null;
 
   function toast(message, bad = false) {
@@ -19,8 +21,9 @@
   }
 
   function setStatus(online) {
-    statusNode.className = `remote-status ${online ? 'on' : 'off'}`;
     statusNode.textContent = online ? '电视已连接' : '电视未连接';
+    chipNode.classList.toggle('on', online);
+    chipNode.classList.toggle('off', !online);
   }
 
   async function send(payload) {
@@ -66,8 +69,15 @@
 
   function bind() {
     for (const button of $$('[data-key]')) {
-      button.addEventListener('click', () => send({ key: button.dataset.key }));
+      button.addEventListener('click', () => {
+        send({ key: button.dataset.key });
+        if (button.closest('.r-numpad')) {
+          numPad.hidden = true;
+          toast(`已发送：频道 ${button.dataset.key}`);
+        }
+      });
     }
+
     for (const button of $$('[data-action]')) {
       button.addEventListener('click', () => {
         const action = button.dataset.action;
@@ -79,10 +89,15 @@
         }
         send({ action });
         const labels = {
+          power: '电源 / 主页',
           home: '主页',
+          menu: '节目列表',
           live: '直播',
           movies: '电影',
-          shorts: '短视频',
+          shorts: 'B 站',
+          list: '节目列表',
+          channelUp: '下一个频道',
+          channelDown: '上一个频道',
           playpause: '播放/暂停',
           fullscreen: '全屏',
           volup: '音量 +',
@@ -90,8 +105,16 @@
           mute: '静音',
         };
         if (labels[action]) toast(`已发送：${labels[action]}`);
+        if (action === 'list') numPad.hidden = true;
       });
     }
+
+    $('#keypadToggle').addEventListener('click', () => {
+      numPad.hidden = !numPad.hidden;
+    });
+    $('#numPadClose').addEventListener('click', () => {
+      numPad.hidden = true;
+    });
 
     $('#sendText').addEventListener('click', sendText);
     $('#searchText').addEventListener('keydown', (event) => {

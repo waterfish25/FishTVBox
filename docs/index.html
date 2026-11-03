@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#2f7ed8">
   <title>FishTVBox · 在线演示</title>
-  <meta name="description" content="FishTVBox 家庭电视盒界面静态演示：左侧 IPTV 频道墙与今日回看，右侧电影海报与 B 站短视频。">
+  <meta name="description" content="FishTVBox 家庭电视盒界面演示：IPTV 直播与全屏节目列表、电影、应用（B 站）、手机扫码遥控。">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/launcher.css">
   <style>
@@ -50,6 +50,13 @@
       width: 16px;
       height: 16px;
     }
+    body.tv .fs-demo-cover {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(2, 8, 20, 0.25), rgba(2, 8, 20, 0.55)),
+        url("assets/stage.jpg") center / cover no-repeat;
+    }
     .demo-toast {
       position: fixed;
       left: 50%;
@@ -69,6 +76,7 @@
       body.tv .demo-badge { display: none; }
     }
   </style>
+  <script src="assets/qrcode.js" defer></script>
 </head>
 <body class="tv">
   <div class="tv-app">
@@ -121,7 +129,7 @@
           <div class="stage-idle" id="stageIdle">
             <div class="idle-clock" id="idleClock">--:--</div>
             <p class="idle-title">选择频道开始观看</p>
-            <p class="idle-sub">方向键移动焦点 · 确认键播放 · 返回键退出</p>
+            <p class="idle-sub">OK 进入全屏 · 全屏中 OK 打开节目列表</p>
           </div>
           <div class="stage-topline" id="stageTopline" hidden>
             <span class="now-badge" id="nowBadge">LIVE</span>
@@ -202,7 +210,7 @@
             <span class="tag">苹果 CMS 示例</span>
           </div>
           <div class="head-actions">
-            <button class="mini-btn" data-demo="搜索电影：实际容器内连接电影源">搜索</button>
+            <button class="mini-btn" data-demo="实际容器内连接电影源后可搜索">搜索</button>
             <button class="mini-btn" data-demo="刷新电影列表">刷新</button>
           </div>
         </div>
@@ -234,118 +242,153 @@
         </div>
       </section>
 
-      <section class="panel shorts-panel">
+      <section class="panel apps-panel">
         <div class="panel-head">
           <div class="panel-title">
             <span class="section-mark warm"></span>
-            <h2>B站短视频</h2>
-            <span class="tag">热门</span>
-          </div>
-          <div class="head-actions">
-            <button class="mini-btn" data-demo="换一批 B 站热门视频">换一批</button>
+            <h2>应用</h2>
+            <span class="tag">主页键返回</span>
           </div>
         </div>
-        <div class="short-grid" id="shortGrid">
-          <button class="short-card" data-demo="演示短视频：夜市烟火">
-            <span class="short-thumb">
-              <img src="assets/poster-2.jpg" alt="夜市烟火">
-              <span class="short-duration">03:24</span>
-              <span class="short-play">▶</span>
+        <div class="app-grid">
+          <button class="app-tile tile-bili" id="biliAppTile">
+            <span class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="5.5" width="18" height="13" rx="3"></rect>
+                <path d="M8 2.5 10.5 5M16 2.5 13.5 5M8.5 11h.01M15.5 11h.01M9 15h6"></path>
+              </svg>
             </span>
-            <span class="short-meta"><span class="short-title">夜市烟火：一口铁锅里的城市温度</span><span class="short-owner">@美食记录</span></span>
+            <span class="app-name">哔哩哔哩</span>
+            <span class="app-sub">热门短视频</span>
           </button>
-          <button class="short-card" data-demo="演示短视频：海岸线延时">
-            <span class="short-thumb">
-              <img src="assets/stage.jpg" alt="海岸线延时">
-              <span class="short-duration">01:58</span>
-              <span class="short-play">▶</span>
+          <button class="app-tile tile-search" data-demo="实际容器内可搜索电影">
+            <span class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="10.5" cy="10.5" r="6.5"></circle>
+                <path d="m15.5 15.5 4 4"></path>
+              </svg>
             </span>
-            <span class="short-meta"><span class="short-title">海岸线延时：城市入夜的一分钟</span><span class="short-owner">@城市影像</span></span>
+            <span class="app-name">搜索</span>
+            <span class="app-sub">查找电影</span>
+          </button>
+          <button class="app-tile tile-settings" data-demo="实际容器访问 /settings 配置直播源与电影源">
+            <span class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3.2"></circle>
+                <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V22h-4v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H2v-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H8a1.7 1.7 0 0 0 1-1.5V2h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V8a1.7 1.7 0 0 0 1.5 1H22v4h-.1a1.7 1.7 0 0 0-1.5 1z"></path>
+              </svg>
+            </span>
+            <span class="app-name">设置</span>
+            <span class="app-sub">配置源地址</span>
+          </button>
+          <button class="app-tile tile-remote" data-demo="手机遥控页：remote.html（可扫码打开）">
+            <span class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="2" width="12" height="20" rx="3"></rect>
+                <path d="M11 18h2"></path>
+              </svg>
+            </span>
+            <span class="app-name">手机遥控</span>
+            <span class="app-sub">打开遥控页</span>
           </button>
         </div>
       </section>
 
-      <div class="app-column">
-        <button class="app-tile tile-settings" data-demo="实际容器访问 /settings 配置直播源与电影源">
-          <span class="app-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3.2"></circle>
-              <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V22h-4v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H2v-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H8a1.7 1.7 0 0 0 1-1.5V2h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V8a1.7 1.7 0 0 0 1.5 1H22v4h-.1a1.7 1.7 0 0 0-1.5 1z"></path>
-            </svg>
-          </span>
-          <span class="app-name">电脑设置</span>
-          <span class="app-sub">配置直播源与电影源</span>
-        </button>
-        <button class="app-tile tile-remote" data-demo="实际容器访问 /remote 使用手机遥控">
-          <span class="app-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="6" y="2" width="12" height="20" rx="3"></rect>
-              <path d="M11 18h2"></path>
-            </svg>
-          </span>
-          <span class="app-name">手机遥控</span>
-          <span class="app-sub">同一局域网扫码使用</span>
-        </button>
-      </div>
-
-      <nav class="quick-row">
-        <button class="quick-tile q-orange" data-focus="#channelGrid">
-          <span class="quick-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2.5" y="4" width="19" height="13" rx="2.5"></rect>
-              <path d="M8 21h8M12 17v4"></path>
-            </svg>
-          </span>
-          <span class="quick-name">全部频道</span>
-        </button>
-        <button class="quick-tile q-coral" data-focus="#catchupList">
-          <span class="quick-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="9"></circle>
-              <path d="M12 7v5l3.2 2"></path>
-            </svg>
-          </span>
-          <span class="quick-name">今日回看</span>
-        </button>
-        <button class="quick-tile q-pink" data-focus="#movieGrid">
-          <span class="quick-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2.5" y="4.5" width="19" height="15" rx="2.5"></rect>
-              <path d="M2.5 9h19M7 4.5l2.5 4.5M14 4.5l2.5 4.5"></path>
-            </svg>
-          </span>
-          <span class="quick-name">电影</span>
-        </button>
-        <button class="quick-tile q-rose" data-focus="#shortGrid">
-          <span class="quick-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2.5" y="4.5" width="19" height="15" rx="2.5"></rect>
-              <path d="m10 8.5 6 3.5-6 3.5z"></path>
-            </svg>
-          </span>
-          <span class="quick-name">B站短视频</span>
-        </button>
-        <button class="quick-tile q-blue" data-demo="完整镜像：ghcr.io/waterfish25/fishtvbox:latest">
-          <span class="quick-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7" rx="2"></rect>
-              <rect x="14" y="3" width="7" height="7" rx="2"></rect>
-              <rect x="3" y="14" width="7" height="7" rx="2"></rect>
-              <rect x="14" y="14" width="7" height="7" rx="2"></rect>
-            </svg>
-          </span>
-          <span class="quick-name">更多应用</span>
-        </button>
-      </nav>
+      <section class="panel remote-panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="section-mark"></span>
+            <h2>手机控制</h2>
+          </div>
+        </div>
+        <div class="qr-wrap">
+          <div class="qr-box" id="qrCode" aria-label="手机遥控二维码"></div>
+          <p class="qr-title">扫码遥控电视</p>
+          <p class="qr-url" id="qrUrl">正在生成地址…</p>
+          <span class="qr-conn"><i></i>演示模式</span>
+          <p class="qr-hint">扫码打开手机遥控演示<br>方向键、OK、数字键、音量均可点击</p>
+        </div>
+      </section>
     </main>
 
     <footer class="tv-footer">
-      <div class="footer-hint">静态演示 · 实际容器支持直播、今日回看、电影源、B 站短视频与手机遥控</div>
+      <div class="footer-hint">方向键移动 · OK 进入全屏 · 全屏中 OK 节目列表 · ↑↓ / 数字键换台 · +/- 音量</div>
       <div class="footer-right">
         <span>ghcr.io/waterfish25/fishtvbox:latest</span>
         <span class="conn-dot">演示模式</span>
       </div>
     </footer>
+  </div>
+
+  <div class="live-fullscreen" id="liveFullscreen" hidden>
+    <div class="fs-demo-cover" aria-hidden="true"></div>
+    <div class="fs-top">
+      <span class="now-badge" id="fsBadge">LIVE</span>
+      <div class="fs-copy">
+        <div class="fs-title" id="fsTitle">CCTV-1 综合</div>
+        <div class="fs-program" id="fsProgram">正在播 · 新闻联播</div>
+      </div>
+      <div class="fs-clock" id="fsClock">--:--</div>
+    </div>
+    <div class="fs-osd" id="fsOsd" hidden></div>
+    <div class="fs-hints">OK 节目列表 · ↑↓ 换台 · 数字键选台 · +/- 音量 · 主页键返回</div>
+    <div class="channel-switcher" id="channelSwitcher" hidden>
+      <div class="cs-head">
+        <h3>节目列表</h3>
+        <span id="csMeta">方向键选择 · OK 播放 · 返回键收起</span>
+      </div>
+      <div class="cs-grid" id="channelSwitcherGrid"></div>
+    </div>
+  </div>
+
+  <div class="bili-view" id="biliView" hidden>
+    <header class="app-view-head">
+      <div class="app-view-title">
+        <span class="bili-mark">B</span>
+        <div>
+          <h2>哔哩哔哩 · 热门</h2>
+          <p>方向键选择 · OK 播放 · 主页键返回主页</p>
+        </div>
+      </div>
+      <div class="app-view-actions">
+        <button class="mini-btn" data-demo="演示站：换一批热门视频">换一批</button>
+        <button class="mini-btn" id="btnBiliHome">返回主页</button>
+      </div>
+    </header>
+    <div class="short-grid bili-grid" id="shortGrid">
+      <button class="short-card" data-demo="演示短视频：夜市烟火">
+        <span class="short-thumb">
+          <img src="assets/poster-2.jpg" alt="夜市烟火">
+          <span class="short-duration">03:24</span>
+          <span class="short-play">▶</span>
+        </span>
+        <span class="short-meta"><span class="short-title">夜市烟火：一口铁锅里的城市温度</span><span class="short-owner">@美食记录</span></span>
+      </button>
+      <button class="short-card" data-demo="演示短视频：海岸线延时">
+        <span class="short-thumb">
+          <img src="assets/stage.jpg" alt="海岸线延时">
+          <span class="short-duration">01:58</span>
+          <span class="short-play">▶</span>
+        </span>
+        <span class="short-meta"><span class="short-title">海岸线延时：城市入夜的一分钟</span><span class="short-owner">@城市影像</span></span>
+      </button>
+      <button class="short-card" data-demo="演示短视频：街角早餐">
+        <span class="short-thumb">
+          <img src="assets/poster-1.jpg" alt="街角早餐">
+          <span class="short-duration">02:11</span>
+          <span class="short-play">▶</span>
+        </span>
+        <span class="short-meta"><span class="short-title">街角早餐：凌晨四点的城市醒来</span><span class="short-owner">@人间烟火</span></span>
+      </button>
+      <button class="short-card" data-demo="演示短视频：山海之间">
+        <span class="short-thumb">
+          <img src="assets/poster-3.jpg" alt="山海之间">
+          <span class="short-duration">04:06</span>
+          <span class="short-play">▶</span>
+        </span>
+        <span class="short-meta"><span class="short-title">山海之间：沿着海岸线自驾</span><span class="short-owner">@旅行日记</span></span>
+      </button>
+    </div>
   </div>
 
   <div class="demo-toast" id="demoToast" hidden></div>
@@ -354,71 +397,344 @@
     (() => {
       const $ = (sel, root = document) => root.querySelector(sel);
       const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
-      let toastTimer = null;
+      const NAV = '[data-nav], .channel-card, .poster-card, .short-card, .app-tile, .mini-btn, #stage, .cs-item';
+
+      const state = {
+        fs: false,
+        list: false,
+        bili: false,
+        index: 0,
+        digits: '',
+        digitTimer: null,
+        osdTimer: null,
+        dimTimer: null,
+        toastTimer: null,
+      };
+
+      const channels = $$('#channelGrid .channel-card').map((card) => ({
+        name: card.dataset.name,
+        program: card.dataset.program || '正在播 · 演示节目',
+        logo: card.querySelector('.ch-logo')?.textContent || '',
+      }));
 
       function showToast(message) {
         const node = $('#demoToast');
         node.textContent = message;
         node.hidden = false;
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => { node.hidden = true; }, 3200);
+        clearTimeout(state.toastTimer);
+        state.toastTimer = setTimeout(() => { node.hidden = true; }, 3200);
       }
+
+      function pad(n) { return String(n).padStart(2, '0'); }
 
       function updateClock() {
         const now = new Date();
-        const pad = (n) => String(n).padStart(2, '0');
         const text = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
         $('#clock').textContent = text;
         $('#idleClock').textContent = text;
+        $('#fsClock').textContent = text;
         $('#dateText').textContent = `${pad(now.getMonth() + 1)}月${pad(now.getDate())}日 周${'日一二三四五六'[now.getDay()]}`;
+        $('#fsProgram') && state.fs && ($('#fsProgram').textContent = channels[state.index].program);
       }
 
-      $$('.channel-card').forEach((card) => {
-        card.addEventListener('click', () => {
-          $$('.channel-card').forEach((item) => item.classList.remove('is-active'));
-          card.classList.add('is-active');
-          $('#nowTitle').textContent = card.dataset.name;
-          $('#nowProgram').textContent = card.dataset.program || '正在播 · 演示节目';
-          $('#stageTopline').hidden = false;
-          $('#catchupHint').textContent = `${card.dataset.name} · 今日节目单`;
+      function focusNode(node) {
+        if (!node) return;
+        node.focus({ preventScroll: true });
+        node.scrollIntoView?.({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+      }
+
+      function scope() {
+        if (state.fs) return $('#liveFullscreen');
+        if (state.bili) return $('#biliView');
+        return document;
+      }
+
+      function focusables() {
+        return $$(NAV, scope()).filter((node) => node.offsetParent !== null && !node.closest('[hidden]'));
+      }
+
+      function moveFocus(direction) {
+        const items = focusables();
+        if (!items.length) return;
+        const current = document.activeElement;
+        if (!items.includes(current)) { focusNode(items[0]); return; }
+        const cr = current.getBoundingClientRect();
+        const cx = cr.left + cr.width / 2;
+        const cy = cr.top + cr.height / 2;
+        let best = null;
+        let score = Infinity;
+        for (const node of items) {
+          if (node === current) continue;
+          const r = node.getBoundingClientRect();
+          const dx = r.left + r.width / 2 - cx;
+          const dy = r.top + r.height / 2 - cy;
+          let primary;
+          let cross;
+          if (direction === 'right') { primary = dx; cross = Math.abs(dy); }
+          else if (direction === 'left') { primary = -dx; cross = Math.abs(dy); }
+          else if (direction === 'down') { primary = dy; cross = Math.abs(dx); }
+          else { primary = -dy; cross = Math.abs(dx); }
+          if (primary <= 3) continue;
+          const s = primary + cross * 2.15;
+          if (s < score) { score = s; best = node; }
+        }
+        focusNode(best);
+      }
+
+      function showOsd(main, sub = '', timeout = 1600) {
+        const node = $('#fsOsd');
+        node.innerHTML = `${main}${sub ? `<small>${sub}</small>` : ''}`;
+        node.hidden = false;
+        clearTimeout(state.osdTimer);
+        state.osdTimer = setTimeout(() => { node.hidden = true; }, timeout);
+      }
+
+      function resetDim() {
+        const layer = $('#liveFullscreen');
+        layer.classList.remove('is-dim');
+        clearTimeout(state.dimTimer);
+        state.dimTimer = setTimeout(() => {
+          if (state.fs && !state.list) layer.classList.add('is-dim');
+        }, 4200);
+      }
+
+      function select(index) {
+        const channel = channels[index];
+        state.index = index;
+        $$('#channelGrid .channel-card').forEach((card, i) => card.classList.toggle('is-active', i === index));
+        $('#nowTitle').textContent = channel.name;
+        $('#nowProgram').textContent = channel.program;
+        $('#stageTopline').hidden = false;
+        $('#catchupHint').textContent = `${channel.name} · 今日节目单`;
+        $('#fsTitle').textContent = channel.name;
+        $('#fsProgram').textContent = channel.program;
+      }
+
+      function openFullscreen() {
+        state.fs = true;
+        state.list = false;
+        $('#liveFullscreen').hidden = false;
+        $('#channelSwitcher').hidden = true;
+        $('#stageTopline').hidden = false;
+        $('#liveFullscreen').classList.remove('is-dim');
+        showOsd(String(state.index + 1).padStart(3, '0'), channels[state.index].name, 2200);
+        resetDim();
+      }
+
+      function closeFullscreen() {
+        if (!state.fs) return;
+        state.fs = false;
+        state.list = false;
+        $('#liveFullscreen').hidden = true;
+        $('#channelSwitcher').hidden = true;
+        $('#fsOsd').hidden = true;
+        clearTimeout(state.osdTimer);
+        clearTimeout(state.dimTimer);
+        focusNode($('#stage'));
+      }
+
+      function renderSwitcher() {
+        const grid = $('#channelSwitcherGrid');
+        grid.innerHTML = '';
+        channels.forEach((channel, index) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = `cs-item${index === state.index ? ' is-active' : ''}`;
+          button.dataset.nav = '';
+          button.innerHTML = `
+            <span class="cs-num">${String(index + 1).padStart(3, '0')}</span>
+            <span class="cs-logo">${channel.logo}</span>
+            <span class="cs-name">${channel.name}</span>
+          `;
+          button.addEventListener('click', () => { select(index); showOsd(String(index + 1).padStart(3, '0'), channel.name); closeSwitcher(); });
+          grid.appendChild(button);
         });
-      });
+        $('#csMeta').textContent = `${channels.length} 个频道 · 方向键选择 · OK 播放 · 返回键收起`;
+      }
 
-      $$('.cat-pill').forEach((pill) => {
-        pill.addEventListener('click', () => {
-          $$('.cat-pill').forEach((item) => item.classList.remove('is-active'));
-          pill.classList.add('is-active');
-          showToast(`演示站：分类「${pill.textContent.trim()}」仅展示样式`);
+      function openSwitcher() {
+        if (!state.fs) return;
+        state.list = true;
+        $('#channelSwitcher').hidden = false;
+        $('#liveFullscreen').classList.remove('is-dim');
+        clearTimeout(state.dimTimer);
+        renderSwitcher();
+        focusNode($('.cs-item.is-active', $('#channelSwitcherGrid')));
+      }
+
+      function closeSwitcher() {
+        state.list = false;
+        $('#channelSwitcher').hidden = true;
+        resetDim();
+      }
+
+      function switchChannel(index) {
+        if (!channels[index]) return;
+        select(index);
+        showOsd(String(index + 1).padStart(3, '0'), channels[index].name, 2200);
+        closeSwitcher();
+        resetDim();
+      }
+
+      function stepChannel(delta) {
+        const next = (state.index + delta + channels.length) % channels.length;
+        switchChannel(next);
+      }
+
+      function handleDigit(digit) {
+        if (!state.fs) return;
+        state.digits = `${state.digits}${digit}`.slice(-3);
+        clearTimeout(state.digitTimer);
+        showOsd(state.digits, '输入频道号', 1400);
+        state.digitTimer = setTimeout(() => {
+          const number = Number(state.digits);
+          state.digits = '';
+          if (number >= 1 && number <= channels.length) switchChannel(number - 1);
+          else showOsd(String(number), '未找到该频道', 1600);
+        }, 1500);
+      }
+
+      function changeVolume(delta) {
+        const next = Math.max(0, Math.min(1, (state.volume ?? 0.6) + delta));
+        state.volume = next;
+        showOsd(`${Math.round(next * 100)}%`, delta > 0 ? '音量 +' : '音量 −', 1200);
+      }
+
+      function openBili() {
+        state.bili = true;
+        $('#biliView').hidden = false;
+        focusNode($('.short-card', $('#shortGrid')));
+      }
+
+      function closeBili() {
+        state.bili = false;
+        $('#biliView').hidden = true;
+        focusNode($('#biliAppTile'));
+      }
+
+      function goBack() {
+        if (state.fs) {
+          if (state.list) closeSwitcher();
+          else closeFullscreen();
+          return true;
+        }
+        if (state.bili) { closeBili(); return true; }
+        return false;
+      }
+
+      function handleKey(raw) {
+        const key = raw === 'OK' ? 'Enter' : raw;
+        if (key === 'Escape' || key === 'Back') return goBack();
+
+        if (state.fs) {
+          if (key === 'Home') { closeFullscreen(); return true; }
+          if (state.list) {
+            if ({ ArrowUp: 1, ArrowDown: 1, ArrowLeft: 1, ArrowRight: 1 }[key]) {
+              moveFocus({ ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[key]);
+              return true;
+            }
+            if (key === 'Enter' || key === ' ') {
+              const target = document.activeElement;
+              if (target?.matches('.cs-item')) target.click();
+              return true;
+            }
+            if (/^[0-9]$/.test(key)) { closeSwitcher(); handleDigit(key); return true; }
+            return true;
+          }
+          if (key === 'Enter' || key === ' ') { openSwitcher(); return true; }
+          if (key === 'ArrowUp') { stepChannel(-1); return true; }
+          if (key === 'ArrowDown') { stepChannel(1); return true; }
+          if (key === 'ArrowLeft' || key === '-' || key === '_') { changeVolume(-0.1); return true; }
+          if (key === 'ArrowRight' || key === '+' || key === '=') { changeVolume(0.1); return true; }
+          if (/^[0-9]$/.test(key)) { handleDigit(key); return true; }
+          if (key === 'm' || key === 'M') { showOsd('静音', '演示模式', 1200); return true; }
+          resetDim();
+          return true;
+        }
+
+        if (state.bili) {
+          if (key === 'Home') { closeBili(); return true; }
+          if ({ ArrowUp: 1, ArrowDown: 1, ArrowLeft: 1, ArrowRight: 1 }[key]) {
+            moveFocus({ ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[key]);
+            return true;
+          }
+          if (key === 'Enter' || key === ' ') {
+            const target = document.activeElement;
+            if (target?.matches('.short-card')) target.click();
+            else focusNode($('.short-card', $('#shortGrid')));
+            return true;
+          }
+          return false;
+        }
+
+        if ({ ArrowUp: 1, ArrowDown: 1, ArrowLeft: 1, ArrowRight: 1 }[key]) {
+          moveFocus({ ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[key]);
+          return true;
+        }
+        if (key === 'Enter' || key === ' ') {
+          const target = document.activeElement;
+          if (target === $('#stage')) openFullscreen();
+          else if (target?.matches(NAV)) target.click();
+          else focusNode($('#channelGrid .channel-card'));
+          return true;
+        }
+        if (key === 'Home') { closeBili(); closeFullscreen(); focusNode($('#channelGrid .channel-card')); return true; }
+        return false;
+      }
+
+      function bind() {
+        $$('#channelGrid .channel-card').forEach((card, index) => {
+          card.addEventListener('click', () => { select(index); openFullscreen(); });
         });
-      });
 
-      $$('.catchup-item').forEach((item) => {
-        item.addEventListener('click', () => {
-          $$('.catchup-item').forEach((node) => node.classList.remove('is-active'));
-          item.classList.add('is-active');
-          showToast('演示站：实际容器会回看当天节目');
+        $('#stage').addEventListener('click', () => openFullscreen());
+
+        $$('.cat-pill').forEach((pill) => {
+          pill.addEventListener('click', () => {
+            $$('.cat-pill').forEach((item) => item.classList.remove('is-active'));
+            pill.classList.add('is-active');
+            showToast(`演示站：分类「${pill.textContent.trim()}」仅展示样式`);
+          });
         });
-      });
 
-      $$('[data-demo]').forEach((node) => {
-        node.addEventListener('click', () => showToast(node.dataset.demo));
-      });
-
-      $$('[data-focus]').forEach((node) => {
-        node.addEventListener('click', () => {
-          const target = $(node.dataset.focus);
-          target?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-          const first = target?.querySelector('button');
-          first?.focus({ preventScroll: true });
+        $$('.catchup-item').forEach((item) => {
+          item.addEventListener('click', () => {
+            $$('.catchup-item').forEach((node) => node.classList.remove('is-active'));
+            item.classList.add('is-active');
+            showToast('演示站：实际容器会回看当天节目');
+          });
         });
-      });
 
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') $('#demoToast').hidden = true;
-      });
+        $$('[data-demo]').forEach((node) => {
+          node.addEventListener('click', () => showToast(node.dataset.demo));
+        });
+
+        $('#biliAppTile').addEventListener('click', openBili);
+        $('#btnBiliHome').addEventListener('click', closeBili);
+
+        document.addEventListener('keydown', (event) => {
+          if (event.ctrlKey || event.metaKey || event.altKey) return;
+          const handled = handleKey(event.key);
+          if (handled) { event.preventDefault(); event.stopPropagation(); }
+        });
+
+        const qrNode = $('#qrCode');
+        const url = `${location.origin}${location.pathname.replace(/index\.html$/, '')}remote.html`;
+        $('#qrUrl').textContent = url;
+        if (typeof qrcode === 'function') {
+          const qr = qrcode(0, 'M');
+          qr.addData(url);
+          qr.make();
+          qrNode.innerHTML = qr.createSvgTag({ cellSize: 3, margin: 0 });
+        } else {
+          qrNode.innerHTML = '<span class="qr-placeholder">二维码组件加载中</span>';
+        }
+      }
 
       updateClock();
       setInterval(updateClock, 15000);
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+      else bind();
     })();
   </script>
 </body>

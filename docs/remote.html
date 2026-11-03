@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#eef2f8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>FishTVBox 手机遥控 · 演示</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/launcher.css">
+  <style>
+    body.remote .r-chip.on i { background: #22b678; box-shadow: 0 0 6px rgba(34, 182, 120, 0.65); }
+  </style>
+</head>
+<body class="remote">
+  <div class="r-app">
+    <header class="r-head">
+      <a class="r-circle" href="index.html" aria-label="回到电视主页">‹</a>
+      <h1>虚拟遥控</h1>
+      <div class="r-head-actions">
+        <span class="r-circle" aria-hidden="true">⋯</span>
+        <span class="r-circle" aria-hidden="true">◎</span>
+      </div>
+    </header>
+
+    <div class="r-chip on" id="remoteChip">
+      <i aria-hidden="true"></i>
+      <span id="remoteStatus">演示模式</span>
+    </div>
+
+    <main class="r-body">
+      <button class="r-func r-power" type="button" data-action="power" aria-label="电源 / 回主页">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v9"></path>
+          <path d="M6.4 7.2a7.5 7.5 0 1 0 11.2 0"></path>
+        </svg>
+      </button>
+      <button class="r-func r-gear" type="button" data-action="settings" aria-label="设置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3.2"></circle>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V22h-4v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H2v-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H8a1.7 1.7 0 0 0 1-1.5V2h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V8a1.7 1.7 0 0 0 1.5 1H22v4h-.1a1.7 1.7 0 0 0-1.5 1z"></path>
+        </svg>
+      </button>
+      <button class="r-func r-mute" type="button" data-action="mute" aria-label="静音">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 5 6.5 9H3v6h3.5L11 19V5z"></path>
+          <path d="m16 9 5 6M21 9l-5 6"></path>
+        </svg>
+      </button>
+
+      <div class="r-pill r-volume">
+        <button type="button" data-action="volup" aria-label="音量加">+</button>
+        <span>音量</span>
+        <button type="button" data-action="voldown" aria-label="音量减">−</button>
+      </div>
+
+      <button class="r-keypad" type="button" id="keypadToggle" aria-label="数字键盘">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="2"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="2"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="2"></rect>
+          <rect x="14" y="14" width="7" height="7" rx="2"></rect>
+        </svg>
+      </button>
+
+      <div class="r-dpad">
+        <button class="r-up" type="button" data-key="ArrowUp" aria-label="上">▲</button>
+        <button class="r-left" type="button" data-key="ArrowLeft" aria-label="左">◀</button>
+        <button class="r-ok" type="button" data-key="Enter" aria-label="确认">OK</button>
+        <button class="r-right" type="button" data-key="ArrowRight" aria-label="右">▶</button>
+        <button class="r-down" type="button" data-key="ArrowDown" aria-label="下">▼</button>
+      </div>
+
+      <div class="r-pill r-channel">
+        <button type="button" data-action="channelUp" aria-label="下一个频道">▲</button>
+        <span>频道</span>
+        <button type="button" data-action="channelDown" aria-label="上一个频道">▼</button>
+      </div>
+
+      <div class="r-numpad" id="numPad" hidden>
+        <div class="r-numpad-head">
+          <strong>输入频道号</strong>
+          <button type="button" id="numPadClose" aria-label="关闭">✕</button>
+        </div>
+        <div class="r-numpad-grid">
+          <button data-key="1">1</button>
+          <button data-key="2">2</button>
+          <button data-key="3">3</button>
+          <button data-key="4">4</button>
+          <button data-key="5">5</button>
+          <button data-key="6">6</button>
+          <button data-key="7">7</button>
+          <button data-key="8">8</button>
+          <button data-key="9">9</button>
+          <span></span>
+          <button data-key="0">0</button>
+          <button data-action="list">列表</button>
+        </div>
+        <p class="r-numpad-tip">全屏播放时输入数字，可直接换台</p>
+      </div>
+
+      <nav class="r-bottom">
+        <button type="button" data-action="menu">
+          <span class="r-bico">☰</span>
+          <span>菜单</span>
+        </button>
+        <button type="button" class="is-main" data-action="home">
+          <span class="r-bico">⌂</span>
+          <span>主页</span>
+        </button>
+        <button type="button" data-key="Escape">
+          <span class="r-bico">↶</span>
+          <span>返回</span>
+        </button>
+      </nav>
+
+      <div class="r-search">
+        <input id="searchText" type="text" placeholder="输入片名，发送到电视搜索" autocomplete="off">
+        <button type="button" id="sendText">发送</button>
+      </div>
+
+      <p class="r-tip">电视端打开 <b id="tvUrl">FishTVBox</b> 后即可遥控，手机与电视需在同一 Wi‑Fi。</p>
+    </main>
+  </div>
+
+  <div class="remote-toast" id="remoteToast" hidden></div>
+  <script>
+    (() => {
+      const $ = (sel) => document.querySelector(sel);
+      const $$ = (sel) => [...document.querySelectorAll(sel)];
+      const numPad = $('#numPad');
+      let toastTimer = null;
+
+      function toast(message) {
+        const node = $('#remoteToast');
+        node.textContent = message;
+        node.hidden = false;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { node.hidden = true; }, 2200);
+      }
+
+      const keyLabels = {
+        ArrowUp: '上', ArrowDown: '下', ArrowLeft: '左', ArrowRight: '右',
+        Enter: '确定', Escape: '返回', 0: '频道 0', 1: '频道 1', 2: '频道 2',
+        3: '频道 3', 4: '频道 4', 5: '频道 5', 6: '频道 6', 7: '频道 7',
+        8: '频道 8', 9: '频道 9',
+      };
+      const actionLabels = {
+        power: '电源 / 主页', settings: '设置', mute: '静音', volup: '音量 +',
+        voldown: '音量 −', channelUp: '下一个频道', channelDown: '上一个频道',
+        menu: '节目列表', home: '主页', list: '节目列表',
+      };
+
+      $$('[data-key]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const key = button.dataset.key;
+          toast(`已发送：${keyLabels[key] || key}`);
+          if (button.closest('.r-numpad')) {
+            numPad.hidden = true;
+            toast(`已发送：频道 ${key}`);
+          }
+        });
+      });
+
+      $$('[data-action]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const action = button.dataset.action;
+          if (action === 'search') {
+            $('#searchText').focus();
+            toast('电视端已打开搜索');
+            return;
+          }
+          toast(`已发送：${actionLabels[action] || action}`);
+          if (action === 'list') numPad.hidden = true;
+        });
+      });
+
+      $('#keypadToggle').addEventListener('click', () => { numPad.hidden = !numPad.hidden; });
+      $('#numPadClose').addEventListener('click', () => { numPad.hidden = true; });
+
+      $('#sendText').addEventListener('click', () => {
+        const input = $('#searchText');
+        const text = input.value.trim();
+        if (!text) { toast('请输入要搜索的内容'); return; }
+        toast(`已发送：${text}`);
+        input.value = '';
+      });
+      $('#searchText').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') { event.preventDefault(); $('#sendText').click(); }
+      });
+
+      const url = `${location.origin}${location.pathname.replace(/remote\.html$/, '')}`;
+      $('#tvUrl').textContent = url;
+      $('#tvUrl').addEventListener('click', () => window.open(url, '_blank', 'noopener'));
+    })();
+  </script>
+</body>
+</html>
