@@ -10,6 +10,7 @@
     siteSubtitle: $('#siteSubtitle'),
     liveStatus: $('#liveStatus'),
     clock: $('#clock'),
+    dateText: $('#dateText'),
     idleClock: $('#idleClock'),
     stage: $('#stage'),
     stageIdle: $('#stageIdle'),
@@ -142,9 +143,13 @@
   }
 
   function updateClock() {
-    const text = formatClock();
+    const now = new Date();
+    const text = formatClock(now);
     el.clock.textContent = text;
     el.idleClock.textContent = text;
+    if (el.dateText) {
+      el.dateText.textContent = `${String(now.getMonth() + 1).padStart(2, '0')}月${String(now.getDate()).padStart(2, '0')}日 周${'日一二三四五六'[now.getDay()]}`;
+    }
   }
 
   /* ---------------- navigation ---------------- */
@@ -1363,6 +1368,44 @@
     $('#btnMovieEmptyGuide').addEventListener('click', openGuide);
     $('#btnShortsRefresh').addEventListener('click', () => loadShorts(true));
     $('#btnShortsEmptyRefresh').addEventListener('click', () => loadShorts(true));
+
+    const baseUrl = () => {
+      const base = state.info?.addresses?.find((address) => !address.includes('127.0.0.1')) || state.info?.addresses?.[0] || location.origin;
+      return base;
+    };
+
+    $('#tileSettings')?.addEventListener('click', openGuide);
+    $('#tileRemote')?.addEventListener('click', () => {
+      window.open(`${baseUrl()}/remote`, '_blank');
+    });
+    $('#quickAll')?.addEventListener('click', () => {
+      if (!state.live) {
+        loadChannels(true);
+        return;
+      }
+      state.category = 'all';
+      renderCategories(state.live);
+      renderChannels();
+      focusFirstChannel();
+    });
+    $('#quickCatchup')?.addEventListener('click', () => {
+      const first = $('.catchup-item', el.catchupList);
+      if (first) focusNode(first);
+      else if (state.currentChannel) loadEpg(state.currentChannel);
+      else toast('先选择一个频道，再查看今日回看');
+    });
+    $('#quickMovies')?.addEventListener('click', () => {
+      const first = $('.poster-card', el.movieGrid);
+      if (first) focusNode(first);
+      else loadMovies(true);
+    });
+    $('#quickShorts')?.addEventListener('click', () => {
+      const first = $('.short-card', el.shortGrid);
+      if (first) focusNode(first);
+      else loadShorts(true);
+    });
+    $('#quickMore')?.addEventListener('click', openGuide);
+
     el.btnPlay.addEventListener('click', () => togglePlayback(state.playerOpen ? el.modalVideo : el.tvVideo));
     el.btnMute.addEventListener('click', () => toggleMute());
     el.btnFullscreen.addEventListener('click', toggleFullscreen);

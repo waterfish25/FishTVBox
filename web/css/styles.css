@@ -2166,3 +2166,1383 @@ body.remote {
   .detail-poster { max-width: 170px; }
   .dpad button { height: 60px; }
 }
+
+/* ============================================================
+   TV launcher（参考电视桌面布局：左侧大频道墙 / 中间媒体卡 /
+   右侧应用方块 / 底部彩色快捷栏）
+   ============================================================ */
+body.tv {
+  color: #10243f;
+  background:
+    radial-gradient(900px 480px at 6% -14%, rgba(255, 255, 255, 0.55), transparent 62%),
+    radial-gradient(1000px 620px at 96% 108%, rgba(19, 72, 165, 0.5), transparent 64%),
+    linear-gradient(180deg, #62c2f7 0%, #4097e9 42%, #2b6dcd 100%);
+}
+
+body.tv::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 72% 16%, rgba(255, 255, 255, 0.4) 0 2px, transparent 3px),
+    radial-gradient(circle at 44% 68%, rgba(255, 255, 255, 0.32) 0 2px, transparent 3px),
+    radial-gradient(circle at 88% 52%, rgba(255, 255, 255, 0.35) 0 2px, transparent 3px);
+  background-size: 520px 460px, 680px 540px, 760px 620px, 900px 700px;
+}
+
+body.tv .tv-app {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶栏 */
+body.tv .topbar {
+  flex: 0 0 58px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 18px 0;
+  padding: 0 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 28px rgba(12, 56, 128, 0.22);
+  backdrop-filter: blur(12px);
+}
+
+body.tv .brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+body.tv .brand-mark {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(140deg, #ffb35c, #ff6a4d);
+  box-shadow: 0 8px 18px rgba(255, 106, 77, 0.32);
+}
+
+body.tv .brand-mark svg {
+  width: 22px;
+  height: 22px;
+}
+
+body.tv .brand-text h1 {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  line-height: 1.15;
+  color: #12294a;
+}
+
+body.tv .brand-text p {
+  font-size: 10px;
+  color: #6c8cb2;
+  letter-spacing: 1.4px;
+}
+
+body.tv .top-status {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+body.tv .status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid rgba(47, 126, 216, 0.18);
+  border-radius: 999px;
+  background: #eef7ff;
+  color: #3c6a9c;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+body.tv .status-pill i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f4a13c;
+  box-shadow: 0 0 8px rgba(244, 161, 60, 0.7);
+}
+
+body.tv .status-pill.ok i {
+  background: #22b678;
+  box-shadow: 0 0 8px rgba(34, 182, 120, 0.7);
+}
+
+body.tv .status-pill.bad i {
+  background: #f0525f;
+  box-shadow: 0 0 8px rgba(240, 82, 95, 0.7);
+}
+
+body.tv .top-sep {
+  width: 1px;
+  height: 16px;
+  background: rgba(47, 126, 216, 0.18);
+}
+
+body.tv .date-text {
+  font-size: 12px;
+  color: #4f759e;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+body.tv .clock {
+  font-size: 18px;
+  font-weight: 700;
+  color: #17395f;
+  font-variant-numeric: tabular-nums;
+}
+
+body.tv .top-actions {
+  display: flex;
+  gap: 8px;
+}
+
+body.tv .icon-btn {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: 1px solid rgba(47, 126, 216, 0.16);
+  background: #f3f9ff;
+  color: #3f6b9b;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+body.tv .icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+body.tv .icon-btn:hover {
+  background: #fff;
+  color: #1c5fae;
+  transform: translateY(-1px);
+}
+
+/* 主网格 */
+body.tv .launcher {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(0, 2fr) minmax(140px, 0.82fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) 112px;
+  gap: 12px;
+  padding: 12px 18px 0;
+}
+
+body.tv .iptv-panel {
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+
+body.tv .movies-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+body.tv .shorts-panel {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+body.tv .app-column {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+}
+
+body.tv .quick-row {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  min-height: 0;
+}
+
+/* 卡片底座 */
+body.tv .panel {
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 22px;
+  box-shadow: 0 18px 38px rgba(12, 56, 128, 0.26);
+}
+
+body.tv .panel::after {
+  display: none;
+}
+
+body.tv .iptv-panel {
+  color: #eaf4ff;
+  border-color: rgba(255, 255, 255, 0.8);
+  background:
+    radial-gradient(220px 160px at 10% 6%, rgba(255, 255, 255, 0.16), transparent 68%),
+    radial-gradient(260px 200px at 92% 4%, rgba(105, 165, 255, 0.32), transparent 70%),
+    radial-gradient(220px 220px at 72% 64%, rgba(126, 104, 255, 0.2), transparent 72%),
+    linear-gradient(155deg, #0b1c45 0%, #123168 56%, #0a1d49 100%);
+}
+
+body.tv .iptv-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.7) 0 1.6px, transparent 2.6px),
+    radial-gradient(circle at 68% 18%, rgba(255, 255, 255, 0.5) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 34% 72%, rgba(255, 255, 255, 0.45) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 88% 62%, rgba(255, 255, 255, 0.5) 0 1.4px, transparent 2.4px);
+  background-size: 340px 300px, 460px 380px, 520px 440px, 620px 500px;
+}
+
+body.tv .movies-panel,
+body.tv .shorts-panel {
+  color: #eaf4ff;
+  border-color: rgba(255, 255, 255, 0.68);
+  background:
+    radial-gradient(240px 180px at 88% -8%, rgba(96, 160, 255, 0.22), transparent 70%),
+    linear-gradient(165deg, #142c55 0%, #0c1c3a 58%, #081529 100%);
+}
+
+/* 卡片头部 */
+body.tv .panel-head {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.tv .iptv-panel .panel-head {
+  flex-basis: 56px;
+  border-bottom: 0;
+  padding: 0 16px;
+}
+
+body.tv .panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+body.tv .panel-title h2 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+body.tv .iptv-panel .panel-title h2 {
+  font-size: 23px;
+  font-weight: 800;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+body.tv .section-mark {
+  width: 3px;
+  height: 14px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #ff8d6b, rgba(255, 141, 107, 0.2));
+}
+
+body.tv .section-mark.warm {
+  background: linear-gradient(180deg, #ffc978, rgba(255, 201, 120, 0.2));
+}
+
+body.tv .tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  max-width: 170px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(226, 240, 255, 0.75);
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.tv .head-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+body.tv .src-address {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(210, 231, 255, 0.55);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+body.tv .mini-btn {
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.09);
+  color: #dcebff;
+  font-size: 11px;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+body.tv .mini-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* 播放区 */
+body.tv .stage {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  height: clamp(200px, 31vh, 340px);
+  margin: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  background: #02060e;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+body.tv .stage:focus {
+  box-shadow: inset 0 0 0 2px rgba(255, 213, 122, 0.9);
+}
+
+body.tv .stage video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  display: block;
+}
+
+body.tv .stage-idle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background:
+    radial-gradient(420px 240px at 50% 62%, rgba(96, 140, 255, 0.24), transparent 68%),
+    radial-gradient(300px 180px at 18% 20%, rgba(255, 255, 255, 0.1), transparent 70%),
+    linear-gradient(150deg, #0a1a3d, #050c20);
+}
+
+body.tv .idle-clock {
+  font-size: clamp(28px, 2.8vw, 44px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+  color: #eef6ff;
+  text-shadow: 0 6px 26px rgba(0, 0, 0, 0.55);
+}
+
+body.tv .idle-title {
+  font-size: 13px;
+  color: #bed6f2;
+}
+
+body.tv .idle-sub {
+  font-size: 11px;
+  color: rgba(190, 214, 242, 0.62);
+}
+
+body.tv .stage.is-playing .stage-idle {
+  display: none;
+}
+
+body.tv .stage-topline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px 40px;
+  background: linear-gradient(180deg, rgba(3, 8, 18, 0.86), transparent);
+  pointer-events: none;
+}
+
+body.tv .now-badge {
+  flex: none;
+  height: 21px;
+  padding: 0 8px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  background: #ff4d5e;
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 14px rgba(255, 77, 94, 0.35);
+}
+
+body.tv .now-badge.catchup {
+  background: linear-gradient(135deg, #ffc46b, #ff7a4d);
+  color: #231006;
+}
+
+body.tv .now-copy {
+  min-width: 0;
+}
+
+body.tv .now-title {
+  font-size: 14px;
+  font-weight: 650;
+  color: #fff;
+  text-shadow: 0 2px 12px #000;
+}
+
+body.tv .now-program {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #aec4e0;
+  text-shadow: 0 2px 10px #000;
+}
+
+body.tv .stage-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 24px 12px 11px;
+  background: linear-gradient(0deg, rgba(3, 8, 18, 0.88), transparent);
+}
+
+body.tv .ctrl-btn {
+  height: 29px;
+  padding: 0 11px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(8, 18, 36, 0.6);
+  color: #dbe9fb;
+  font-size: 11px;
+  backdrop-filter: blur(8px);
+}
+
+body.tv .player-state {
+  margin-left: auto;
+  font-size: 10px;
+  color: rgba(190, 214, 242, 0.6);
+}
+
+body.tv .stage-error {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 70%;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 77, 94, 0.35);
+  border-radius: 10px;
+  background: rgba(30, 8, 12, 0.82);
+  color: #ffb7bd;
+  font-size: 12px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+/* 今日回看 */
+body.tv .catchup-strip {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  padding: 8px 12px 6px;
+  border-bottom: 0;
+  background: transparent;
+}
+
+body.tv .catchup-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+body.tv .catchup-title {
+  font-size: 12px;
+  font-weight: 650;
+  color: #eaf3ff;
+}
+
+body.tv .catchup-title::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 2px;
+  background: #ffc46b;
+  vertical-align: -1px;
+}
+
+body.tv .catchup-head small {
+  color: rgba(198, 219, 243, 0.55);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+body.tv .catchup-hint {
+  margin-left: auto;
+  color: rgba(198, 219, 243, 0.55);
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.tv .catchup-list {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  min-height: 46px;
+  padding: 1px 1px 2px;
+}
+
+body.tv .catchup-item {
+  flex: none;
+  width: 138px;
+  min-height: 42px;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.07);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+body.tv .catchup-item:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+
+body.tv .catchup-item .ci-time {
+  font-size: 9.5px;
+  color: #ffd48c;
+  font-variant-numeric: tabular-nums;
+}
+
+body.tv .catchup-item .ci-title {
+  font-size: 11px;
+  color: #ddebfb;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.tv .catchup-item.is-live {
+  border-color: rgba(255, 100, 115, 0.55);
+  background: rgba(255, 77, 94, 0.16);
+}
+
+body.tv .catchup-item.is-live .ci-time {
+  color: #ffa5ae;
+}
+
+body.tv .catchup-item.is-active {
+  border-color: rgba(255, 208, 120, 0.85);
+  background: rgba(255, 196, 107, 0.18);
+}
+
+body.tv .catchup-item.is-future {
+  opacity: 0.45;
+}
+
+body.tv .catchup-empty {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  color: rgba(198, 219, 243, 0.55);
+  font-size: 11px;
+}
+
+/* 频道墙 */
+body.tv .channel-block {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body.tv .cats {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 6px;
+  padding: 4px 12px 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+body.tv .cats::-webkit-scrollbar {
+  display: none;
+}
+
+body.tv .cat-pill {
+  flex: none;
+  height: 25px;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  color: rgba(212, 230, 251, 0.78);
+  font-size: 10.5px;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+body.tv .cat-pill:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+body.tv .cat-pill.is-active {
+  color: #1d1004;
+  background: linear-gradient(135deg, #ffd27a, #ff9b52);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+body.tv .channel-grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 7px;
+  padding: 7px 12px 12px;
+  align-content: start;
+}
+
+body.tv .channel-card {
+  height: 64px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  text-align: center;
+  transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+body.tv .channel-card:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+body.tv .channel-card.is-active {
+  background: rgba(255, 196, 107, 0.16);
+  border-color: rgba(255, 208, 120, 0.8);
+}
+
+body.tv .ch-logo {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffd48c;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+body.tv .ch-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+body.tv .ch-name {
+  width: 100%;
+  min-width: 0;
+  font-size: 10px;
+  color: #e2eeff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.tv .channel-card.is-active .ch-name {
+  color: #fff;
+}
+
+/* 电影 / 短视频内容 */
+body.tv .poster-grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
+  padding: 9px 12px 12px;
+  align-content: start;
+}
+
+body.tv .poster-card {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 0;
+  background:
+    linear-gradient(150deg, rgba(255, 106, 77, 0.14), rgba(20, 40, 72, 0.6)),
+    #0b1830;
+  text-align: left;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+body.tv .poster-card:hover {
+  transform: translateY(-2px);
+}
+
+body.tv .poster-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transition: opacity 0.25s ease;
+}
+
+body.tv .poster-card img.is-error {
+  opacity: 0;
+}
+
+body.tv .poster-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 10px;
+  text-align: center;
+  line-height: 1.35;
+  background:
+    radial-gradient(100px 110px at 70% 15%, rgba(255, 191, 105, 0.16), transparent 70%),
+    linear-gradient(150deg, #1b3358, #0a1526);
+}
+
+body.tv .poster-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(0deg, rgba(2, 6, 14, 0.94) 0%, rgba(2, 6, 14, 0.3) 44%, transparent 64%);
+}
+
+body.tv .poster-meta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  padding: 20px 7px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+body.tv .poster-name {
+  font-size: 11px;
+  font-weight: 650;
+  color: #f2f7ff;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+body.tv .poster-note {
+  font-size: 9px;
+  color: #a9c1dd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.tv .poster-remark {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 3;
+  max-width: calc(100% - 10px);
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(3, 8, 16, 0.74);
+  backdrop-filter: blur(4px);
+  color: #f1dcc2;
+  font-size: 8.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.tv .short-grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px 12px 12px;
+  align-content: start;
+}
+
+body.tv .short-card {
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  padding: 0;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  text-align: left;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+body.tv .short-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+body.tv .short-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(150deg, #1e3a61, #0a1526);
+  overflow: hidden;
+}
+
+body.tv .short-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+body.tv .short-thumb img.is-error {
+  opacity: 0;
+}
+
+body.tv .short-duration {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(3, 8, 16, 0.78);
+  font-size: 9px;
+  color: #e5eef8;
+  font-variant-numeric: tabular-nums;
+}
+
+body.tv .short-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(3, 8, 16, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  font-size: 11px;
+  color: #fff;
+}
+
+body.tv .short-meta {
+  padding: 6px 7px 7px;
+}
+
+body.tv .short-title {
+  font-size: 10.5px;
+  color: #dbe9fb;
+  line-height: 1.35;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 27px;
+}
+
+body.tv .short-owner {
+  margin-top: 2px;
+  font-size: 9px;
+  color: rgba(190, 214, 242, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 右侧应用方块 */
+body.tv .app-tile {
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 22px;
+  color: #fff;
+  box-shadow: 0 18px 38px rgba(12, 56, 128, 0.26);
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+body.tv .app-tile::after {
+  content: "";
+  position: absolute;
+  top: -36%;
+  right: -28%;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+
+body.tv .app-tile:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+body.tv .tile-settings {
+  background: linear-gradient(155deg, #b99dff 0%, #7d5cff 58%, #5a3ce0 100%);
+}
+
+body.tv .tile-remote {
+  background: linear-gradient(155deg, #66dbff 0%, #2f8dff 58%, #1c67dd 100%);
+}
+
+body.tv .app-icon {
+  width: min(54px, 46%);
+  aspect-ratio: 1;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 22px rgba(21, 36, 90, 0.28);
+}
+
+body.tv .app-icon svg {
+  width: 52%;
+  height: 52%;
+}
+
+body.tv .tile-settings .app-icon {
+  color: #6f4df5;
+}
+
+body.tv .tile-remote .app-icon {
+  color: #1f7bef;
+}
+
+body.tv .app-name {
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: 0.4px;
+  text-shadow: 0 2px 10px rgba(20, 32, 80, 0.35);
+}
+
+body.tv .app-sub {
+  padding: 0 8px;
+  font-size: 9.5px;
+  line-height: 1.35;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+/* 底部快捷栏 */
+body.tv .quick-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 14px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 20px;
+  color: #fff;
+  box-shadow: 0 16px 32px rgba(12, 56, 128, 0.24);
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+body.tv .quick-tile::after {
+  content: "";
+  position: absolute;
+  bottom: -46%;
+  right: -10%;
+  width: 60%;
+  height: 120%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  pointer-events: none;
+}
+
+body.tv .quick-tile:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+body.tv .quick-icon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+body.tv .quick-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+body.tv .quick-name {
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  text-shadow: 0 2px 8px rgba(30, 34, 80, 0.3);
+}
+
+body.tv .q-orange {
+  background: linear-gradient(150deg, #ffbf5a 0%, #ff8a1f 100%);
+}
+
+body.tv .q-coral {
+  background: linear-gradient(150deg, #ff9a63 0%, #ff5f3b 100%);
+}
+
+body.tv .q-pink {
+  background: linear-gradient(150deg, #ff7fae 0%, #ff3d78 100%);
+}
+
+body.tv .q-rose {
+  background: linear-gradient(150deg, #ff86c0 0%, #f9488f 100%);
+}
+
+body.tv .q-blue {
+  background: linear-gradient(150deg, #63bdff 0%, #1f7bf0 100%);
+}
+
+/* 焦点：白色描边 + 暖色光晕 */
+body.tv [data-nav]:focus-visible,
+body.tv .tv [data-nav]:focus {
+  outline: none;
+}
+
+body.tv button:focus-visible,
+body.tv [data-nav]:focus {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.95), 0 0 0 7px rgba(255, 170, 70, 0.65),
+    0 18px 38px rgba(12, 56, 128, 0.26) !important;
+  border-color: #fff !important;
+  z-index: 4;
+}
+
+body.tv .channel-card:focus,
+body.tv .poster-card:focus,
+body.tv .short-card:focus,
+body.tv .catchup-item:focus,
+body.tv .mini-btn:focus,
+body.tv .ctrl-btn:focus,
+body.tv .icon-btn:focus,
+body.tv .stage:focus {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 6px rgba(255, 196, 107, 0.75) !important;
+}
+
+/* 空状态 */
+body.tv .empty-state {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+  text-align: center;
+}
+
+body.tv .empty-kicker {
+  font-size: 9px;
+  letter-spacing: 2.2px;
+  color: rgba(198, 219, 243, 0.5);
+}
+
+body.tv .empty-state h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #eaf3ff;
+}
+
+body.tv .empty-state p {
+  max-width: 280px;
+  font-size: 11px;
+  color: rgba(205, 224, 246, 0.7);
+  line-height: 1.6;
+}
+
+body.tv .empty-state .solid-btn {
+  margin-top: 4px;
+}
+
+/* 页脚 */
+body.tv .tv-footer {
+  flex: 0 0 34px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 26px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 10px;
+  text-shadow: 0 1px 6px rgba(14, 46, 96, 0.4);
+}
+
+body.tv .footer-hint {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.tv .footer-hint b {
+  color: #fff4d8;
+  font-weight: 600;
+}
+
+body.tv .footer-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+body.tv #sourceFooter {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.tv .conn-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+body.tv .conn-dot::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #7df0b8;
+  box-shadow: 0 0 8px rgba(125, 240, 184, 0.7);
+}
+
+body.tv .conn-dot.bad::before {
+  background: #ff7a86;
+  box-shadow: 0 0 8px rgba(255, 122, 134, 0.6);
+}
+
+/* 电视端滚动条 */
+body.tv * {
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+
+body.tv *::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+body.tv *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 大屏与小屏适配 */
+@media (max-height: 760px) {
+  body.tv .stage {
+    height: clamp(170px, 27vh, 250px);
+  }
+  body.tv .launcher {
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) 94px;
+    gap: 10px;
+  }
+  body.tv .quick-icon {
+    width: 34px;
+    height: 34px;
+  }
+  body.tv .quick-name {
+    font-size: 13px;
+  }
+  body.tv .iptv-panel .panel-title h2 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 1180px) {
+  body.tv .launcher {
+    grid-template-columns: minmax(0, 1.9fr) minmax(0, 1.7fr) minmax(120px, 0.72fr);
+  }
+  body.tv .src-address {
+    display: none;
+  }
+  body.tv .app-sub {
+    display: none;
+  }
+  body.tv .quick-tile {
+    padding: 0 10px;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 900px) {
+  body.tv {
+    overflow-y: auto;
+  }
+  body.tv .tv-app {
+    height: auto;
+    min-height: 100vh;
+  }
+  body.tv .launcher {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    padding-bottom: 12px;
+  }
+  body.tv .iptv-panel,
+  body.tv .movies-panel,
+  body.tv .shorts-panel,
+  body.tv .app-column,
+  body.tv .quick-row {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  body.tv .iptv-panel {
+    min-height: 520px;
+  }
+  body.tv .movies-panel,
+  body.tv .shorts-panel {
+    min-height: 300px;
+  }
+  body.tv .app-column {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 130px;
+  }
+  body.tv .quick-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 82px;
+  }
+  body.tv .quick-tile {
+    padding: 0 12px;
+  }
+  body.tv .stage {
+    height: 46vw;
+    min-height: 200px;
+  }
+  body.tv .date-text,
+  body.tv .top-sep {
+    display: none;
+  }
+  body.tv .tv-footer {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  body.tv .topbar {
+    margin: 10px 12px 0;
+    padding: 0 12px;
+    gap: 10px;
+  }
+  body.tv .launcher {
+    padding: 10px 12px 0;
+    gap: 10px;
+  }
+  body.tv .brand-text h1 {
+    font-size: 16px;
+  }
+  body.tv .brand-text p {
+    display: none;
+  }
+  body.tv .top-actions .icon-btn:first-child {
+    display: none;
+  }
+  body.tv .status-pill {
+    display: none;
+  }
+  body.tv .quick-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#070a0f">
+  <meta name="theme-color" content="#2f7ed8">
   <title>FishTVBox · 家庭电视盒</title>
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.webmanifest">
@@ -15,34 +15,58 @@
   <div class="tv-app">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark">F</div>
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 10.5 12 3l9 7.5"></path>
+            <path d="M5 9.8V20h5v-5h4v5h5V9.8"></path>
+          </svg>
+        </div>
         <div class="brand-text">
           <h1 id="siteTitle">FishTVBox</h1>
           <p id="siteSubtitle">家庭电视盒</p>
         </div>
       </div>
+
       <div class="top-status">
         <span class="status-pill" id="liveStatus"><i></i><span>直播源准备中</span></span>
+        <span class="top-sep" aria-hidden="true"></span>
+        <span class="date-text" id="dateText">--月--日</span>
         <span class="clock" id="clock">--:--</span>
       </div>
+
       <nav class="top-actions">
-        <button class="pill-btn" data-nav id="btnGuide">遥控 / 地址</button>
-        <button class="pill-btn" data-nav id="btnReload">刷新内容</button>
-        <button class="pill-btn" data-nav id="btnSettings">电脑设置</button>
+        <button class="icon-btn" data-nav id="btnGuide" aria-label="遥控与地址" title="遥控与地址">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+            <path d="M8 9h.01M12 9h.01M16 9h.01M8 14h.01M12 14h.01M16 14h.01"></path>
+          </svg>
+        </button>
+        <button class="icon-btn" data-nav id="btnReload" aria-label="刷新内容" title="刷新内容">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-3.2-6.9"></path>
+            <path d="M21 4v5h-5"></path>
+          </svg>
+        </button>
+        <button class="icon-btn" data-nav id="btnSettings" aria-label="电脑设置" title="电脑设置">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3.2"></circle>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V22h-4v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H2v-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H8a1.7 1.7 0 0 0 1-1.5V2h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V8a1.7 1.7 0 0 0 1.5 1H22v4h-.1a1.7 1.7 0 0 0-1.5 1z"></path>
+          </svg>
+        </button>
       </nav>
     </header>
 
-    <main class="layout">
+    <main class="launcher">
       <section class="panel iptv-panel">
         <div class="panel-head">
           <div class="panel-title">
             <span class="live-dot" aria-hidden="true"></span>
-            <h2>IPTV 直播</h2>
+            <h2>电视频道</h2>
             <span class="tag" id="iptvSourceName">加载中</span>
           </div>
           <div class="head-actions">
             <span class="src-address" id="iptvAddress">直播访问地址</span>
-            <button class="mini-btn" data-nav id="btnIptvRefresh">刷新频道</button>
+            <button class="mini-btn" data-nav id="btnIptvRefresh">刷新</button>
           </div>
         </div>
 
@@ -90,48 +114,119 @@
         </div>
       </section>
 
-      <aside class="side">
-        <section class="panel movies-panel">
-          <div class="panel-head">
-            <div class="panel-title">
-              <span class="section-mark"></span>
-              <h2>电影</h2>
-              <span class="tag" id="movieSourceName">加载中</span>
-            </div>
-            <div class="head-actions">
-              <button class="mini-btn" data-nav id="btnMovieSearch">搜索</button>
-              <button class="mini-btn" data-nav id="btnMovieRefresh">刷新</button>
-            </div>
+      <section class="panel movies-panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="section-mark"></span>
+            <h2>电影</h2>
+            <span class="tag" id="movieSourceName">加载中</span>
           </div>
-          <div class="poster-grid" id="movieGrid"></div>
-          <div class="empty-state" id="movieEmpty" hidden>
-            <span class="empty-kicker">MOVIES</span>
-            <h3>还没有电影源</h3>
-            <p id="movieEmptyText">在电脑打开配置页，添加苹果 CMS 接口即可。</p>
-            <button class="solid-btn" data-nav id="btnMovieEmptyGuide">查看配置地址</button>
+          <div class="head-actions">
+            <button class="mini-btn" data-nav id="btnMovieSearch">搜索</button>
+            <button class="mini-btn" data-nav id="btnMovieRefresh">刷新</button>
           </div>
-        </section>
+        </div>
+        <div class="poster-grid" id="movieGrid"></div>
+        <div class="empty-state" id="movieEmpty" hidden>
+          <span class="empty-kicker">MOVIES</span>
+          <h3>还没有电影源</h3>
+          <p id="movieEmptyText">在电脑打开配置页，添加苹果 CMS 接口即可。</p>
+          <button class="solid-btn" data-nav id="btnMovieEmptyGuide">查看配置地址</button>
+        </div>
+      </section>
 
-        <section class="panel shorts-panel">
-          <div class="panel-head">
-            <div class="panel-title">
-              <span class="section-mark warm"></span>
-              <h2>B站短视频</h2>
-              <span class="tag">热门</span>
-            </div>
-            <div class="head-actions">
-              <button class="mini-btn" data-nav id="btnShortsRefresh">换一批</button>
-            </div>
+      <section class="panel shorts-panel">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="section-mark warm"></span>
+            <h2>B站短视频</h2>
+            <span class="tag">热门</span>
           </div>
-          <div class="short-grid" id="shortGrid"></div>
-          <div class="empty-state" id="shortEmpty" hidden>
-            <span class="empty-kicker">SHORTS</span>
-            <h3>短视频加载失败</h3>
-            <p id="shortEmptyText">B 站接口暂时不可用，稍后再试。</p>
-            <button class="solid-btn" data-nav id="btnShortsEmptyRefresh">重试</button>
+          <div class="head-actions">
+            <button class="mini-btn" data-nav id="btnShortsRefresh">换一批</button>
           </div>
-        </section>
-      </aside>
+        </div>
+        <div class="short-grid" id="shortGrid"></div>
+        <div class="empty-state" id="shortEmpty" hidden>
+          <span class="empty-kicker">SHORTS</span>
+          <h3>短视频加载失败</h3>
+          <p id="shortEmptyText">B 站接口暂时不可用，稍后再试。</p>
+          <button class="solid-btn" data-nav id="btnShortsEmptyRefresh">重试</button>
+        </div>
+      </section>
+
+      <div class="app-column">
+        <button class="app-tile tile-settings" data-nav id="tileSettings">
+          <span class="app-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3.2"></circle>
+              <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V22h-4v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H2v-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H8a1.7 1.7 0 0 0 1-1.5V2h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V8a1.7 1.7 0 0 0 1.5 1H22v4h-.1a1.7 1.7 0 0 0-1.5 1z"></path>
+            </svg>
+          </span>
+          <span class="app-name">电脑设置</span>
+          <span class="app-sub">配置直播源与电影源</span>
+        </button>
+        <button class="app-tile tile-remote" data-nav id="tileRemote">
+          <span class="app-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="6" y="2" width="12" height="20" rx="3"></rect>
+              <path d="M11 18h2"></path>
+            </svg>
+          </span>
+          <span class="app-name">手机遥控</span>
+          <span class="app-sub">同一局域网扫码使用</span>
+        </button>
+      </div>
+
+      <nav class="quick-row">
+        <button class="quick-tile q-orange" data-nav id="quickAll">
+          <span class="quick-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.5" y="4" width="19" height="13" rx="2.5"></rect>
+              <path d="M8 21h8M12 17v4"></path>
+            </svg>
+          </span>
+          <span class="quick-name">全部频道</span>
+        </button>
+        <button class="quick-tile q-coral" data-nav id="quickCatchup">
+          <span class="quick-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 7v5l3.2 2"></path>
+            </svg>
+          </span>
+          <span class="quick-name">今日回看</span>
+        </button>
+        <button class="quick-tile q-pink" data-nav id="quickMovies">
+          <span class="quick-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.5" y="4.5" width="19" height="15" rx="2.5"></rect>
+              <path d="M2.5 9h19M7 4.5l2.5 4.5M14 4.5l2.5 4.5"></path>
+            </svg>
+          </span>
+          <span class="quick-name">电影</span>
+        </button>
+        <button class="quick-tile q-rose" data-nav id="quickShorts">
+          <span class="quick-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.5" y="4.5" width="19" height="15" rx="2.5"></rect>
+              <path d="m10 8.5 6 3.5-6 3.5z"></path>
+            </svg>
+          </span>
+          <span class="quick-name">B站短视频</span>
+        </button>
+        <button class="quick-tile q-blue" data-nav id="quickMore">
+          <span class="quick-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="2"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="2"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="2"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="2"></rect>
+            </svg>
+          </span>
+          <span class="quick-name">更多应用</span>
+        </button>
+      </nav>
     </main>
 
     <footer class="tv-footer">
