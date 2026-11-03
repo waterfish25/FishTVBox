@@ -1,0 +1,18 @@
+{
+  "name": "FishTVBox 家庭电视盒",
+  "short_name": "FishTVBox",
+  "description": "IPTV、电影与短视频电视端界面，支持手机遥控",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#070a0f",
+  "theme_color": "#070a0f",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

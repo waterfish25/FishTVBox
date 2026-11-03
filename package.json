@@ -1,0 +1,14 @@
+{
+  "name": "fishtvbox",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Dockerized TV box web UI: IPTV, movies, Bilibili shorts and remote control",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

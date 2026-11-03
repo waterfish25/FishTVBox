@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#070a0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>FishTVBox 手机遥控</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="remote">
+  <div class="remote-wrap">
+    <header class="remote-head">
+      <div class="brand-mark">F</div>
+      <div>
+        <h1>FishTVBox 遥控</h1>
+        <p>与电视端保持同一局域网</p>
+      </div>
+      <span class="remote-status" id="remoteStatus">检测电视</span>
+    </header>
+
+    <section class="dpad-panel">
+      <div class="dpad">
+        <button class="up" type="button" data-key="ArrowUp" aria-label="向上">▲</button>
+        <button class="left" type="button" data-key="ArrowLeft" aria-label="向左">◀</button>
+        <button class="ok" type="button" data-key="Enter" aria-label="确认">OK</button>
+        <button class="right" type="button" data-key="ArrowRight" aria-label="向右">▶</button>
+        <button class="down" type="button" data-key="ArrowDown" aria-label="向下">▼</button>
+      </div>
+    </section>
+
+    <section class="remote-btn-row">
+      <button class="remote-btn" type="button" data-key="Escape">返回</button>
+      <button class="remote-btn" type="button" data-action="home">主页</button>
+      <button class="remote-btn" type="button" data-action="playpause">播放</button>
+      <button class="remote-btn" type="button" data-action="fullscreen">全屏</button>
+    </section>
+
+    <section class="quick-grid">
+      <button class="quick-tile" type="button" data-action="live">直播</button>
+      <button class="quick-tile" type="button" data-action="movies">电影</button>
+      <button class="quick-tile" type="button" data-action="shorts">短视频</button>
+      <button class="quick-tile" type="button" data-action="search">搜索</button>
+    </section>
+
+    <section class="voice-panel">
+      <input class="input" id="searchText" type="text" placeholder="输入片名，发送到电视搜索" autocomplete="off">
+      <button class="solid-btn" id="sendText" type="button">发送</button>
+    </section>
+
+    <section class="volume-row">
+      <button type="button" data-action="volup">音量 +</button>
+      <button type="button" data-action="mute">静音</button>
+      <button type="button" data-action="voldown">音量 −</button>
+    </section>
+
+    <p class="remote-tip">电视端打开 <b id="tvUrl">FishTVBox</b> 后即可遥控。手机与电视需在同一局域网；若电视没有响应，请确认电视页面仍在运行。</p>
+    <p class="remote-tip"><a href="/settings">打开电脑配置页</a> · <a href="/" target="_blank" rel="noopener">打开电视端</a></p>
+  </div>
+
+  <div class="remote-toast" id="remoteToast" hidden></div>
+  <script src="/js/remote.js" defer></script>
+</body>
+</html>

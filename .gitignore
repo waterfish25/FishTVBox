@@ -1,0 +1,8 @@
+data/
+node_modules/
+.uploads/
+screenshots/
+*.log
+.DS_Store
+.idea/
+.vscode/

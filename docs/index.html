@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070a0f">
+<title>FishTVBox · 在线演示</title>
+<meta name="description" content="FishTVBox 家庭电视盒：IPTV、当天回看、电影与 B 站短视频，单个 Docker 容器运行，手机即可遥控。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='30' fill='%23070a0f'/%3E%3Crect x='16' y='16' width='96' height='96' rx='24' fill='%23ffb347'/%3E%3Ctext x='64' y='82' text-anchor='middle' font-family='Arial' font-size='54' font-weight='800' fill='%231b0b05'%3EF%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#070a0f;
+    --bg2:#0b1119;
+    --panel:#0e141d;
+    --panel2:#111a26;
+    --line:rgba(255,255,255,.09);
+    --line2:rgba(255,255,255,.14);
+    --text:#f6f3ea;
+    --muted:#8d9aab;
+    --muted2:#667386;
+    --accent:#ffb347;
+    --accent2:#ff5a3c;
+    --green:#63d59b;
+    --blue:#6fb3ff;
+    --radius:20px;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 12% -5%, rgba(255,179,71,.12), transparent 60%),
+      radial-gradient(900px 520px at 92% 8%, rgba(111,179,255,.1), transparent 62%),
+      var(--bg);
+    color:var(--text);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;line-height:1.55;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;color:inherit}
+  ::selection{background:rgba(255,179,71,.28)}
+  .wrap{width:min(1380px,calc(100% - 48px));margin:0 auto}
+
+  /* nav */
+  .nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);
+    background:rgba(7,10,15,.72);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;
+    height:70px;width:min(1380px,calc(100% - 48px));margin:0 auto}
+  .brand{display:flex;align-items:center;gap:12px}
+  .mark{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1b0b05;font-weight:900;font-size:20px;box-shadow:0 8px 24px rgba(255,120,60,.25)}
+  .brand b{font-size:19px;letter-spacing:.2px}
+  .brand span{display:block;font-size:12px;color:var(--muted)}
+  .nav-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .nav-links a,.nav-links .pill{border:1px solid var(--line2);border-radius:999px;
+    padding:9px 15px;font-size:13px;color:var(--muted);transition:.2s}
+  .nav-links a:hover{color:var(--text);border-color:rgba(255,179,71,.5);background:rgba(255,179,71,.08)}
+  .nav-links a.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#1c0d06;border:0;font-weight:700}
+  .nav-links a.primary:hover{filter:brightness(1.08)}
+
+  /* hero */
+  .hero{padding:64px 0 28px;display:grid;grid-template-columns:1.15fr .85fr;gap:46px;align-items:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);border:1px solid rgba(255,179,71,.3);
+    background:rgba(255,179,71,.08);border-radius:999px;padding:7px 13px}
+  .eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+  h1{font-size:clamp(34px,4.4vw,58px);line-height:1.08;margin:20px 0 16px;letter-spacing:-1.5px}
+  h1 em{font-style:normal;background:linear-gradient(100deg,var(--accent),var(--accent2) 70%);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{font-size:16px;color:var(--muted);max-width:540px;margin:0 0 26px}
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+  .btn{border-radius:999px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;
+    border:1px solid var(--line2);background:rgba(255,255,255,.04);transition:.2s;display:inline-flex;
+    align-items:center;gap:8px}
+  .btn:hover{transform:translateY(-1px);border-color:rgba(255,179,71,.55);background:rgba(255,179,71,.09)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:#1c0d06;
+    box-shadow:0 10px 30px rgba(255,110,50,.22)}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 11px;
+    background:rgba(255,255,255,.025)}
+  .chip b{color:var(--text);font-weight:600}
+  .hero-side{display:flex;flex-direction:column;gap:14px}
+  .quote{border:1px solid var(--line);background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+    border-radius:var(--radius);padding:20px}
+  .quote p{margin:0;font-size:14px;color:var(--muted)}
+  .quote b{color:var(--text)}
+  .mini-list{display:grid;gap:10px}
+  .mini{display:flex;gap:12px;align-items:flex-start;padding:13px 16px;border:1px solid var(--line);
+    border-radius:14px;background:rgba(255,255,255,.022)}
+  .mini strong{display:block;font-size:13px}
+  .mini span{display:block;font-size:12px;color:var(--muted2)}
+  .mini .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);margin-top:6px;flex:none}
+  .mini .dot.g{background:var(--green)}
+  .mini .dot.b{background:var(--blue)}
+
+  /* screen */
+  .screen{margin:26px 0 70px;border:1px solid var(--line);border-radius:26px;overflow:hidden;
+    background:linear-gradient(180deg,#0b1119,#080c12);
+    box-shadow:0 40px 120px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06)}
+  .screen-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:13px 20px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
+  .dots{display:flex;gap:6px}
+  .dots i{width:10px;height:10px;border-radius:50%;background:#2b3444}
+  .dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
+  .screen-title{font-size:12px;color:var(--muted2);font-family:var(--mono)}
+  .demo-badge{font-size:11px;color:var(--green);border:1px solid rgba(99,213,155,.3);
+    background:rgba(99,213,155,.08);padding:5px 10px;border-radius:999px}
+
+  .tv{display:grid;grid-template-columns:2.05fr .95fr;gap:16px;padding:16px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .ph{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;
+    border-bottom:1px solid var(--line)}
+  .ph h2{margin:0;font-size:14px;letter-spacing:.3px;display:flex;align-items:center;gap:8px}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:#ff5a3c;box-shadow:0 0 0 0 rgba(255,90,60,.5);
+    animation:pulse 2s infinite}
+  @keyframes pulse{70%{box-shadow:0 0 0 7px rgba(255,90,60,0)}100%{box-shadow:0 0 0 0 rgba(255,90,60,0)}}
+  .ph small{font-size:11px;color:var(--muted2);font-family:var(--mono)}
+
+  .stage{position:relative;aspect-ratio:16/8.2;background:#000;overflow:hidden}
+  .stage img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) brightness(.82)}
+  .stage .veil{position:absolute;inset:0;background:
+    linear-gradient(180deg,rgba(4,7,11,.12),rgba(4,7,11,.82) 88%),
+    linear-gradient(90deg,rgba(4,7,11,.5),transparent 42%)}
+  .stage .play{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);
+    width:66px;height:66px;border-radius:50%;border:1px solid rgba(255,255,255,.28);
+    background:rgba(8,12,18,.56);backdrop-filter:blur(8px);display:grid;place-items:center;
+    cursor:pointer;transition:.2s}
+  .stage .play:hover{background:rgba(255,179,71,.2);border-color:rgba(255,179,71,.65);transform:translate(-50%,-50%) scale(1.06)}
+  .stage .play svg{width:20px;height:20px}
+  .stage .meta{position:absolute;left:20px;right:20px;bottom:16px;display:flex;justify-content:space-between;
+    align-items:end;gap:14px}
+  .stage .meta h3{margin:0 0 4px;font-size:20px;letter-spacing:.4px}
+  .stage .meta p{margin:0;font-size:12px;color:#c7cfdb}
+  .stage .meta .right{text-align:right;font-size:11px;color:#aeb8c5;font-family:var(--mono)}
+  .progress{position:absolute;left:20px;right:20px;bottom:0;height:2px;background:rgba(255,255,255,.14)}
+  .progress i{display:block;height:100%;width:38%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+
+  .catchup{padding:11px 14px 14px}
+  .catchup-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  .catchup-h span{font-size:11px;color:var(--muted2)}
+  .timeline{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+  .time-slot{flex:none;border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:11px;
+    padding:8px 12px;text-align:left;cursor:pointer;transition:.18s;min-width:104px}
+  .time-slot:hover,.time-slot:focus-visible{border-color:rgba(255,179,71,.5);background:rgba(255,179,71,.08);outline:0}
+  .time-slot b{display:block;font-size:11px;color:var(--muted2);font-weight:500}
+  .time-slot span{display:block;font-size:12px;color:var(--text);white-space:nowrap}
+  .time-slot.live b{color:var(--accent)}
+  .time-slot.live{border-color:rgba(255,179,71,.35);background:rgba(255,179,71,.09)}
+
+  .channel-block{padding:12px 14px 14px;border-top:1px solid var(--line)}
+  .channel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .channel-head h3{margin:0;font-size:12px;color:var(--muted);font-weight:500}
+  .channel-head span{font-size:11px;color:var(--muted2)}
+  .channels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .channel{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--line);
+    border-radius:12px;background:rgba(255,255,255,.025);cursor:pointer;text-align:left;transition:.18s}
+  .channel:hover,.channel:focus-visible,.channel.is-active{border-color:rgba(255,179,71,.52);
+    background:rgba(255,179,71,.08);transform:translateY(-1px);outline:0}
+  .channel.is-active{box-shadow:0 0 0 2px rgba(255,179,71,.18)}
+  .logo{width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;
+    font-size:13px;font-weight:800;color:#150a03}
+  .channel b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .channel small{display:block;font-size:10px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .side{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .movie-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px}
+  .poster{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--line);
+    background:#0a0f16;aspect-ratio:3/4.15;transition:.2s}
+  .poster:hover,.poster:focus-visible{transform:translateY(-2px);border-color:rgba(255,179,71,.5);outline:0;
+    box-shadow:0 12px 28px rgba(0,0,0,.45)}
+  .poster img{width:100%;height:100%;object-fit:cover;display:block;transition:.3s}
+  .poster:hover img{transform:scale(1.04)}
+  .poster .pv{position:absolute;inset:0;background:linear-gradient(180deg,transparent 42%,rgba(4,7,11,.85))}
+  .poster .pm{position:absolute;left:9px;right:9px;bottom:8px}
+  .poster b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .poster small{display:block;font-size:10px;color:#b7c1ce}
+  .poster .score{position:absolute;right:8px;top:8px;font-size:10px;font-family:var(--mono);
+    background:rgba(7,10,15,.7);border:1px solid var(--line);border-radius:6px;padding:2px 5px;color:var(--accent)}
+
+  .shorts{padding-bottom:6px}
+  .short-row{display:flex;gap:9px;overflow-x:auto;padding:12px}
+  .short{flex:none;width:152px;border-radius:12px;overflow:hidden;border:1px solid var(--line);cursor:pointer;
+    background:#0a0f16;transition:.2s;text-align:left;padding:0}
+  .short:hover,.short:focus-visible{transform:translateY(-2px);border-color:rgba(111,179,255,.55);outline:0}
+  .short img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+  .short .sm{padding:8px 9px 9px}
+  .short b{display:block;font-size:11px;line-height:1.35;height:30px;overflow:hidden}
+  .short small{display:block;font-size:10px;color:var(--muted2);margin-top:3px}
+
+  /* demo dock */
+  .dock{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 16px;
+    border-top:1px solid var(--line);background:rgba(255,255,255,.018);flex-wrap:wrap}
+  .dock-hint{font-size:12px;color:var(--muted2)}
+  .dock-hint b{color:var(--muted);font-weight:600}
+  .dock-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .dock-actions button{font-size:12px;border:1px solid var(--line2);background:rgba(255,255,255,.04);
+    border-radius:999px;padding:7px 13px;cursor:pointer;transition:.18s}
+  .dock-actions button:hover{border-color:rgba(255,179,71,.5);background:rgba(255,179,71,.09)}
+
+  /* features */
+  .section-head{max-width:640px;margin-bottom:26px}
+  .section-head h2{font-size:clamp(24px,3vw,34px);margin:8px 0 10px;letter-spacing:-.6px}
+  .section-head p{margin:0;color:var(--muted);font-size:14px}
+  .kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .features{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:70px}
+  .feature{border:1px solid var(--line);border-radius:18px;padding:20px;background:
+    linear-gradient(165deg,rgba(255,255,255,.045),rgba(255,255,255,.015));transition:.2s}
+  .feature:hover{transform:translateY(-3px);border-color:rgba(255,179,71,.32)}
+  .feature .no{font-family:var(--mono);font-size:11px;color:var(--muted2)}
+  .feature h3{font-size:15px;margin:12px 0 7px}
+  .feature p{font-size:12.5px;color:var(--muted);margin:0}
+  .feature .bar{height:2px;width:34px;background:linear-gradient(90deg,var(--accent),var(--accent2));
+    margin-top:16px;border-radius:2px}
+
+  /* deploy */
+  .deploy{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:70px}
+  .code-card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#0a0f16}
+  .code-head{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;
+    border-bottom:1px solid var(--line);font-size:12px;color:var(--muted2)}
+  .copy{border:1px solid var(--line2);background:rgba(255,255,255,.04);border-radius:8px;
+    padding:4px 10px;font-size:11px;cursor:pointer;transition:.18s}
+  .copy:hover{border-color:rgba(255,179,71,.5);color:var(--accent)}
+  pre{margin:0;padding:16px 15px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;
+    color:#d6dee9;line-height:1.75}
+  pre .c{color:#6b7a8d}
+  pre .a{color:var(--accent)}
+  .deploy-side{display:flex;flex-direction:column;gap:12px}
+  .link-card{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    border:1px solid var(--line);border-radius:14px;padding:15px 17px;background:rgba(255,255,255,.025);
+    transition:.18s}
+  .link-card:hover{border-color:rgba(255,179,71,.4);background:rgba(255,179,71,.06)}
+  .link-card b{display:block;font-size:13px}
+  .link-card span{display:block;font-size:11.5px;color:var(--muted2);word-break:break-all}
+  .link-card .go{flex:none;font-size:12px;color:var(--accent)}
+
+  footer{border-top:1px solid var(--line);padding:30px 0 46px;color:var(--muted2);font-size:12px}
+  .foot-inner{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  footer a{color:var(--muted)}
+  footer a:hover{color:var(--accent)}
+  .disclaimer{max-width:760px}
+
+  /* modal */
+  .modal{position:fixed;inset:0;z-index:90;display:none;place-items:center;padding:24px;
+    background:rgba(3,5,8,.72);backdrop-filter:blur(10px)}
+  .modal.open{display:grid}
+  .modal-card{width:min(760px,100%);border:1px solid var(--line2);border-radius:22px;overflow:hidden;
+    background:linear-gradient(170deg,#101823,#0a0f16);display:grid;grid-template-columns:280px 1fr;
+    box-shadow:0 40px 100px rgba(0,0,0,.6);animation:pop .22s ease-out}
+  @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+  .modal-card img{width:100%;height:100%;object-fit:cover;min-height:320px}
+  .modal-body{padding:24px;display:flex;flex-direction:column;gap:10px}
+  .modal-body h3{margin:0;font-size:22px}
+  .modal-body .mmeta{font-size:12px;color:var(--muted2);font-family:var(--mono)}
+  .modal-body p{font-size:13px;color:var(--muted);margin:0;line-height:1.8}
+  .modal-actions{display:flex;gap:10px;margin-top:auto;padding-top:16px}
+  .close-modal{position:absolute;right:20px;top:18px;width:34px;height:34px;border-radius:50%;
+    border:1px solid var(--line2);background:rgba(7,10,15,.75);cursor:pointer;font-size:16px;z-index:2}
+  .modal .inside{position:relative}
+
+  .toast{position:fixed;left:50%;bottom:34px;transform:translate(-50%,16px);z-index:100;
+    background:rgba(16,24,35,.94);border:1px solid rgba(255,179,71,.4);color:var(--text);
+    padding:11px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.24s}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:1100px){
+    .hero{grid-template-columns:1fr;gap:28px}
+    .features{grid-template-columns:1fr 1fr}
+    .tv{grid-template-columns:1fr}
+    .side{display:grid;grid-template-columns:1fr 1fr}
+    .deploy{grid-template-columns:1fr}
+  }
+  @media (max-width:760px){
+    .wrap,.nav-inner{width:calc(100% - 28px)}
+    .hero{padding:40px 0 18px}
+    .channels{grid-template-columns:1fr 1fr}
+    .side{grid-template-columns:1fr}
+    .features{grid-template-columns:1fr}
+    .movie-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .poster b{font-size:10px}
+    .modal-card{grid-template-columns:1fr}
+    .modal-card img{min-height:200px;max-height:240px}
+    .nav-links a:not(.primary){display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">
+      <span class="mark">F</span>
+      <span>
+        <b>FishTVBox</b>
+        <span>家庭电视盒 · Docker</span>
+      </span>
+    </a>
+    <nav class="nav-links">
+      <a href="#demo">界面演示</a>
+      <a href="#features">功能</a>
+      <a href="#deploy">部署</a>
+      <a href="https://github.com/waterfish25/FishTVBox" target="_blank" rel="noopener">GitHub</a>
+      <a class="primary" href="#deploy">获取镜像</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <span class="eyebrow"><i></i>Live Demo · 静态示例站</span>
+        <h1>把浏览器变成<br><em>家庭电视盒</em></h1>
+        <p class="lead">
+          IPTV 直播与当天回看、电影海报墙、B 站短视频，全部收进一个简洁的分块界面。
+          单个 Docker 容器运行，电脑配置，电视播放，手机遥控。
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#demo">查看界面演示</a>
+          <a class="btn" href="https://github.com/waterfish25/FishTVBox" target="_blank" rel="noopener">GitHub 仓库</a>
+        </div>
+        <div class="chips">
+          <span class="chip"><b>1</b> 个容器</span>
+          <span class="chip"><b>8686</b> 端口</span>
+          <span class="chip">零第三方依赖</span>
+          <span class="chip">支持键盘 / 遥控器 / 手机</span>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="quote">
+          <p><b>左侧 IPTV，右侧点播。</b><br>
+          最大区域留给直播画面与今日回看时间轴，电影与 B 站短视频作为补充。
+          遥控焦点自动吸附到最近的控件，方向键即可操作。</p>
+        </div>
+        <div class="mini-list">
+          <div class="mini"><span class="dot g"></span><div><strong>电脑访问 /settings</strong><span>配置直播源、电影源、短视频</span></div></div>
+          <div class="mini"><span class="dot b"></span><div><strong>手机访问 /remote</strong><span>同一局域网，即开即用遥控器</span></div></div>
+          <div class="mini"><span class="dot"></span><div><strong>电视访问 /</strong><span>全屏打开，方向键导航</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="demo">
+      <div class="screen-bar">
+        <div class="dots"><i></i><i></i><i></i></div>
+        <span class="screen-title">FishTVBox · TV interface demo</span>
+        <span class="demo-badge">静态演示 · 可用方向键</span>
+      </div>
+
+      <div class="tv">
+        <section class="panel iptv">
+          <div class="ph">
+            <h2><span class="live-dot"></span> IPTV 直播</h2>
+            <small id="clock">--:--</small>
+          </div>
+          <div class="stage">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cinematic%20aerial%20view%20of%20a%20glowing%20coastal%20city%20at%20night%2C%20deep%20blue%20and%20amber%20lights%2C%20ultra%20wide%2C%20no%20text&image_size=landscape_16_9" alt="演示频道画面">
+            <div class="veil"></div>
+            <button class="play" id="playBtn" aria-label="播放演示">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M8 5l11 7-11 7z"/></svg>
+            </button>
+            <div class="meta">
+              <div>
+                <h3 id="nowChannel">演示 01 · 城市夜景</h3>
+                <p id="nowProgram">正在播 · 海岸线 4K 风光</p>
+              </div>
+              <div class="right">1080P · HLS<br><span id="playState">点击播放</span></div>
+            </div>
+            <div class="progress"><i></i></div>
+          </div>
+
+          <div class="catchup">
+            <div class="catchup-h">
+              <strong style="font-size:12px">今日回看</strong>
+              <span id="dateLabel">今天</span>
+            </div>
+            <div class="timeline" id="timeline">
+              <button class="time-slot"><b>00:00 - 01:00</b><span>回看节目</span></button>
+              <button class="time-slot"><b>01:00 - 02:00</b><span>回看节目</span></button>
+              <button class="time-slot"><b>02:00 - 03:00</b><span>回看节目</span></button>
+              <button class="time-slot live"><b>当前 · 直播</b><span>海岸线风光</span></button>
+              <button class="time-slot"><b>下一时段</b><span>回看节目</span></button>
+            </div>
+          </div>
+
+          <div class="channel-block">
+            <div class="channel-head">
+              <h3>频道列表</h3>
+              <span>方向键切换 · 确认播放</span>
+            </div>
+            <div class="channels" id="channels">
+              <button class="channel is-active" data-name="演示 01 · 城市夜景" data-program="正在播 · 海岸线 4K 风光">
+                <span class="logo" style="background:linear-gradient(135deg,#ffc46b,#ff5a3c)">01</span>
+                <span><b>城市夜景</b><small>风光 · 4K</small></span>
+              </button>
+              <button class="channel" data-name="演示 02 · 深空回响" data-program="正在播 · 纪录片《深空》">
+                <span class="logo" style="background:linear-gradient(135deg,#7cc3ff,#3b6fd4)">02</span>
+                <span><b>深空回响</b><small>纪录 · HD</small></span>
+              </button>
+              <button class="channel" data-name="演示 03 · 雨夜列车" data-program="正在播 · 电影《雨夜》">
+                <span class="logo" style="background:linear-gradient(135deg,#b9a4ff,#6a4bd6)">03</span>
+                <span><b>雨夜列车</b><small>电影 · HD</small></span>
+              </button>
+              <button class="channel" data-name="演示 04 · 山海之间" data-program="正在播 · 旅行《山海》">
+                <span class="logo" style="background:linear-gradient(135deg,#8fe3b4,#2b9a6a)">04</span>
+                <span><b>山海之间</b><small>旅行 · HD</small></span>
+              </button>
+              <button class="channel" data-name="演示 05 · 霓虹追缉" data-program="正在播 · 剧集《霓虹》">
+                <span class="logo" style="background:linear-gradient(135deg,#ff9ec4,#d63b74)">05</span>
+                <span><b>霓虹追缉</b><small>剧集 · HD</small></span>
+              </button>
+              <button class="channel" data-name="演示 06 · 深夜食堂" data-program="正在播 · 美食《深夜》">
+                <span class="logo" style="background:linear-gradient(135deg,#ffd98a,#e08a2e)">06</span>
+                <span><b>深夜食堂</b><small>美食 · HD</small></span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <aside class="side">
+          <section class="panel">
+            <div class="ph">
+              <h2>电影</h2>
+              <small>苹果 CMS 源</small>
+            </div>
+            <div class="movie-grid">
+              <button class="poster" data-title="深空回响" data-meta="2026 · 科幻 / 冒险 · 豆瓣 8.6"
+                data-desc="一支深空探测队在环状行星附近收到来自二十年前的信号。随着回声逐渐清晰，他们发现那段声音来自自己。">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cinematic%20sci-fi%20movie%20poster%20art%2C%20lone%20astronaut%20before%20a%20giant%20ringed%20planet%2C%20deep%20blue%20and%20amber%20lighting%2C%20dramatic%2C%20no%20text%2C%20vertical&image_size=portrait_4_3" alt="深空回响海报">
+                <span class="pv"></span><span class="score">8.6</span>
+                <span class="pm"><b>深空回响</b><small>科幻 · 冒险</small></span>
+              </button>
+              <button class="poster" data-title="雨夜列车" data-meta="2025 · 悬疑 / 剧情 · 豆瓣 8.2"
+                data-desc="末班列车在暴雨中停靠一个不存在的站台。乘客们发现，每个人都在等待同一件从未发生的事。">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cinematic%20noir%20movie%20poster%20art%2C%20vintage%20steam%20train%20in%20heavy%20rain%20at%20night%2C%20warm%20station%20lights%2C%20moody%2C%20no%20text%2C%20vertical&image_size=portrait_4_3" alt="雨夜列车海报">
+                <span class="pv"></span><span class="score">8.2</span>
+                <span class="pm"><b>雨夜列车</b><small>悬疑 · 剧情</small></span>
+              </button>
+              <button class="poster" data-title="山海之间" data-meta="2026 · 纪录 / 人文 · 豆瓣 9.0"
+                data-desc="从海边渔村到高原牧场，三条迁徙路线串起普通人的一年。镜头记录的不是风景，而是等待与重逢。">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cinematic%20movie%20poster%20art%2C%20misty%20mountains%20and%20a%20small%20village%20at%20sunrise%2C%20teal%20and%20gold%2C%20no%20text%2C%20vertical&image_size=portrait_4_3" alt="山海之间海报">
+                <span class="pv"></span><span class="score">9.0</span>
+                <span class="pm"><b>山海之间</b><small>纪录 · 人文</small></span>
+              </button>
+              <button class="poster" data-title="霓虹追缉" data-meta="2025 · 动作 / 犯罪 · 豆瓣 7.9"
+                data-desc="一名骑手在凌晨的城市里穿行，把每一单外卖送到指定地点。直到某晚，订单上的地址开始指向他失去的记忆。">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cinematic%20thriller%20movie%20poster%20art%2C%20neon%20lit%20city%20street%20at%20night%2C%20running%20silhouette%2C%20magenta%20and%20cyan%2C%20no%20text%2C%20vertical&image_size=portrait_4_3" alt="霓虹追缉海报">
+                <span class="pv"></span><span class="score">7.9</span>
+                <span class="pm"><b>霓虹追缉</b><small>动作 · 犯罪</small></span>
+              </button>
+            </div>
+          </section>
+
+          <section class="panel shorts">
+            <div class="ph">
+              <h2>短视频</h2>
+              <small>B 站热门</small>
+            </div>
+            <div class="short-row">
+              <button class="short" data-video="深夜食堂 · 铁板炒饭">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=close-up%20of%20sizzling%20street%20food%20in%20a%20wok%2C%20steam%2C%20night%20market%2C%20warm%20colors%2C%20no%20text&image_size=landscape_16_9" alt="美食短视频">
+                <span class="sm"><b>深夜食堂 · 铁板炒饭</b><small>美食 · 02:31</small></span>
+              </button>
+              <button class="short" data-video="城市天际线 · 延时">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=aerial%20view%20of%20a%20futuristic%20city%20skyline%20at%20dusk%2C%20glowing%20lights%2C%20no%20text&image_size=landscape_16_9" alt="城市短视频">
+                <span class="sm"><b>城市天际线 · 延时</b><small>旅行 · 01:48</small></span>
+              </button>
+              <button class="short" data-video="雨天窗边的猫">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=cozy%20cat%20sleeping%20on%20a%20windowsill%20with%20rain%20outside%2C%20soft%20light%2C%20no%20text&image_size=landscape_16_9" alt="萌宠短视频">
+                <span class="sm"><b>雨天窗边的猫</b><small>萌宠 · 00:56</small></span>
+              </button>
+            </div>
+          </section>
+        </aside>
+      </div>
+
+      <div class="dock">
+        <span class="dock-hint"><b>试试看：</b>点击频道切换画面，点击海报查看详情，或直接使用 ← → ↑ ↓ 与 Enter。</span>
+        <div class="dock-actions">
+          <button id="prevCh">上一台</button>
+          <button id="nextCh">下一台</button>
+          <button id="togglePlay">播放 / 暂停</button>
+          <button id="focusMovies">电影区</button>
+          <button id="resetDemo">回到首页</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="section-head">
+        <span class="kicker">Why FishTVBox</span>
+        <h2>为客厅屏幕做的界面</h2>
+        <p>不追求复杂，只保留看电视最常用的三件事：直播、回看与点播。</p>
+      </div>
+      <div class="features">
+        <div class="feature"><span class="no">01</span><h3>直播与今日回看</h3><p>解析 M3U / TXT 源，读取今日 EPG；无节目单时按小时生成当天回看时段。</p><div class="bar"></div></div>
+        <div class="feature"><span class="no">02</span><h3>电影海报墙</h3><p>接入苹果 CMS V10 采集源，自动获取列表、搜索、详情与选集播放。</p><div class="bar"></div></div>
+        <div class="feature"><span class="no">03</span><h3>B 站短视频</h3><p>抓取热门视频并按最长时长筛选，内嵌播放器直接观看。</p><div class="bar"></div></div>
+        <div class="feature"><span class="no">04</span><h3>手机即遥控</h3><p>同一局域网打开 /remote，方向键、确认、返回、搜索与音量全部可用。</p><div class="bar"></div></div>
+      </div>
+    </section>
+
+    <section id="deploy">
+      <div class="section-head">
+        <span class="kicker">Deploy</span>
+        <h2>拉取镜像，一条命令启动</h2>
+        <p>镜像由 GitHub Actions 自动构建并推送到 GitHub Container Registry。</p>
+      </div>
+      <div class="deploy">
+        <div class="code-card">
+          <div class="code-head"><span>docker run</span><button class="copy" data-copy="run">复制</button></div>
+<pre id="runCmd"><span class="c"># 拉取并运行</span>
+docker run -d --name fishtvbox \
+  --restart unless-stopped \
+  -p 8686:8686 \
+  -e TZ=Asia/Shanghai \
+  -v "$(pwd)/data:/data" \
+  <span class="a">ghcr.io/waterfish25/fishtvbox:latest</span></pre>
+        </div>
+        <div class="code-card">
+          <div class="code-head"><span>docker compose</span><button class="copy" data-copy="compose">复制</button></div>
+<pre id="composeCmd"><span class="c"># 在仓库目录执行</span>
+git clone https://github.com/waterfish25/FishTVBox.git
+cd FishTVBox
+docker compose up -d
+
+<span class="c"># 或直接拉取已构建镜像</span>
+docker compose pull &amp;&amp; docker compose up -d</pre>
+        </div>
+      </div>
+      <div class="deploy-side" style="margin-bottom:70px">
+        <a class="link-card" href="https://github.com/waterfish25/FishTVBox" target="_blank" rel="noopener">
+          <div><b>GitHub 仓库</b><span>waterfish25/FishTVBox · 源码、Issue 与 Releases</span></div><span class="go">打开</span>
+        </a>
+        <a class="link-card" href="https://github.com/waterfish25/FishTVBox/pkgs/container/fishtvbox" target="_blank" rel="noopener">
+          <div><b>容器镜像</b><span>ghcr.io/waterfish25/fishtvbox:latest</span></div><span class="go">查看</span>
+        </a>
+        <a class="link-card" href="https://github.com/waterfish25/FishTVBox#readme" target="_blank" rel="noopener">
+          <div><b>部署与配置说明</b><span>直播源、电影源、回看与局域网遥控</span></div><span class="go">阅读</span>
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="wrap foot-inner">
+      <div>
+        <b>FishTVBox</b> · 个人学习与家庭自用的媒体聚合界面
+      </div>
+      <div class="disclaimer">
+        本示例站为纯静态演示，不提供、不存储任何音视频内容。直播源、电影源与短视频均来自第三方公开接口，
+        其可用性与版权归相应提供方所有。请遵守当地法律法规与内容服务条款。
+        <br><a href="https://github.com/waterfish25/FishTVBox" target="_blank" rel="noopener">GitHub</a> ·
+        <a href="https://github.com/waterfish25/FishTVBox/blob/main/README.md" target="_blank" rel="noopener">README</a>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<div class="modal" id="modal">
+  <div class="inside">
+    <div class="modal-card">
+      <img id="modalImg" src="" alt="">
+      <div class="modal-body">
+        <h3 id="modalTitle"></h3>
+        <div class="mmeta" id="modalMeta"></div>
+        <p id="modalDesc"></p>
+        <div class="modal-actions">
+          <button class="btn primary" id="modalPlay">播放演示</button>
+          <button class="btn" id="modalClose">关闭</button>
+        </div>
+      </div>
+    </div>
+    <button class="close-modal" id="modalX" aria-label="关闭">×</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+  const channels = $$('.channel');
+  let active = 0;
+  let playing = false;
+  let toastTimer = null;
+
+  function toast(text) {
+    const el = $('#toast');
+    el.textContent = text;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  function selectChannel(index) {
+    active = (index + channels.length) % channels.length;
+    channels.forEach((el, i) => el.classList.toggle('is-active', i === active));
+    const el = channels[active];
+    $('#nowChannel').textContent = el.dataset.name;
+    $('#nowProgram').textContent = el.dataset.program;
+    channels[active].focus({ preventScroll: true });
+    playing = false;
+    $('#playState').textContent = '点击播放';
+    $('.progress i').style.width = '38%';
+  }
+
+  function togglePlay() {
+    playing = !playing;
+    $('#playState').textContent = playing ? '正在播放' : '已暂停';
+    $('.progress i').style.width = playing ? '64%' : '38%';
+    toast(playing ? '演示播放中（真实播放需运行 Docker）' : '已暂停');
+  }
+
+  channels.forEach((el, i) => el.addEventListener('click', () => selectChannel(i)));
+
+  $('#prevCh').addEventListener('click', () => selectChannel(active - 1));
+  $('#nextCh').addEventListener('click', () => selectChannel(active + 1));
+  $('#togglePlay').addEventListener('click', togglePlay);
+  $('#playBtn').addEventListener('click', togglePlay);
+  $('#focusMovies').addEventListener('click', () => $$('.poster')[0].focus());
+  $('#resetDemo').addEventListener('click', () => {
+    selectChannel(0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  $$('.time-slot').forEach((slot) => {
+    slot.addEventListener('click', () => toast('演示：回看需要直播源支持 catchup'));
+  });
+
+  $$('.short').forEach((card) => {
+    card.addEventListener('click', () => toast(`演示：${card.dataset.video}（真实内容由 B 站接口提供）`));
+  });
+
+  // movie modal
+  const modal = $('#modal');
+  $$('.poster').forEach((card) => {
+    card.addEventListener('click', () => {
+      $('#modalImg').src = card.querySelector('img').src;
+      $('#modalImg').alt = card.dataset.title;
+      $('#modalTitle').textContent = card.dataset.title;
+      $('#modalMeta').textContent = card.dataset.meta;
+      $('#modalDesc').textContent = card.dataset.desc;
+      modal.classList.add('open');
+      $('#modalClose').focus();
+    });
+  });
+  const closeModal = () => modal.classList.remove('open');
+  $('#modalClose').addEventListener('click', closeModal);
+  $('#modalX').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  $('#modalPlay').addEventListener('click', () => {
+    closeModal();
+    toast('演示：电影播放需配置苹果 CMS 源');
+  });
+
+  // keyboard: spatial-ish simple navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeModal(); return; }
+    if (modal.classList.contains('open')) return;
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); selectChannel(active - 1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); selectChannel(active + 1); }
+    else if (e.key === 'Enter' && document.activeElement && document.activeElement.classList.contains('channel')) {
+      e.preventDefault(); togglePlay();
+    }
+  });
+
+  // copy
+  $$('.copy').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const map = { run: $('#runCmd'), compose: $('#composeCmd') };
+      const text = map[btn.dataset.copy].innerText;
+      try {
+        await navigator.clipboard.writeText(text);
+        toast('命令已复制');
+      } catch {
+        const area = document.createElement('textarea');
+        area.value = text; area.style.position = 'fixed'; area.style.opacity = '0';
+        document.body.appendChild(area); area.select();
+        document.execCommand('copy'); area.remove();
+        toast('命令已复制');
+      }
+    });
+  });
+
+  // clock in Asia/Shanghai
+  function tick() {
+    const now = new Date();
+    const time = new Intl.DateTimeFormat('zh-CN', {
+      timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', hour12: false,
+    }).format(now);
+    $('#clock').textContent = time;
+    $('#dateLabel').textContent = new Intl.DateTimeFormat('zh-CN', {
+      timeZone: 'Asia/Shanghai', month: '2-digit', day: '2-digit', weekday: 'short',
+    }).format(now);
+  }
+  tick();
+  setInterval(tick, 30000);
+
+  // broken generated images fall back to gradient cards
+  $$('img').forEach((img) => {
+    img.addEventListener('error', () => {
+      img.style.display = 'none';
+      const holder = img.parentElement;
+      if (holder) holder.style.background = 'linear-gradient(150deg,#1a2740,#0c121b 60%,#241a12)';
+    });
+  });
+})();
+</script>
+</body>
+</html>

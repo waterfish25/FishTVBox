@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070a0f">
+  <title>FishTVBox · 电脑配置</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="page">
+  <div class="page-wrap">
+    <header class="page-head">
+      <div class="brand-mark">F</div>
+      <div>
+        <h1>FishTVBox 控制台</h1>
+        <p>在这里配置直播源、电影源与短视频，保存后电视端立即生效。</p>
+      </div>
+      <div class="page-links">
+        <a class="pill-btn" href="/" target="_blank" rel="noopener">打开电视端</a>
+        <a class="pill-btn" href="/remote" target="_blank" rel="noopener">手机遥控</a>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="card-index">01</span>
+        <div>
+          <h2>局域网访问地址</h2>
+          <p>电视与手机需与运行容器的设备处在同一局域网。若下方地址不可达，请用设备的局域网 IP 替换。</p>
+        </div>
+      </div>
+      <div class="address-cards" id="addressCards"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="card-index">02</span>
+        <div>
+          <h2>IPTV 直播源</h2>
+          <p>支持标准 M3U / M3U8 / TXT 频道列表，自动解析分组、台标、XMLTV 节目单与当天回看地址。按顺序尝试，第一个有频道的源生效。</p>
+        </div>
+      </div>
+      <div class="source-list" id="iptvSources"></div>
+      <button class="add-btn" id="addIptvSource" type="button">+ 添加直播源</button>
+      <div class="field-grid" style="margin-top:14px">
+        <div class="field">
+          <label for="iptvCache">频道缓存分钟数</label>
+          <input class="input" id="iptvCache" type="number" min="1" max="120" step="1">
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <div class="source-tools">
+            <button class="mini-btn" id="testIptvBtn" type="button">测试第一条源</button>
+            <span class="test-result" id="iptvTestResult"></span>
+          </div>
+        </div>
+      </div>
+      <p class="hint">
+        内置咪咕地址可能因上游维护而返回 0 个频道，程序会自动尝试加速地址与内置演示源。可粘贴任意 IPTV M3U 地址，例如
+        <code>https://example.com/live.m3u</code>。回看依赖列表里的 <code>catchup</code> / <code>catchup-source</code> 属性及
+        <code>x-tvg-url</code> 节目单。
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="card-index">03</span>
+        <div>
+          <h2>电影源</h2>
+          <p>填写苹果 CMS V10 采集接口地址即可（<code>ac=videolist</code> / <code>ac=detail</code> 协议）。可添加多个源，第一个可用的源生效。</p>
+        </div>
+      </div>
+      <div class="source-list" id="movieSources"></div>
+      <button class="add-btn" id="addMovieSource" type="button">+ 添加电影源</button>
+      <div class="source-tools" style="margin-top:12px">
+        <button class="mini-btn" id="testMovieBtn" type="button">测试第一条电影源</button>
+        <span class="test-result" id="movieTestResult"></span>
+      </div>
+      <p class="hint">
+        示例接口格式：<code>https://caiji.example.com/api.php/provide/vod</code>。部分采集站需要 <code>https</code> 或白名单，若加载失败请先在电脑浏览器打开接口确认返回 JSON。
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="card-index">04</span>
+        <div>
+          <h2>B站短视频</h2>
+          <p>抓取 B 站热门视频，筛出较短的内容并在电视端直接内嵌播放。需要容器能访问 <code>api.bilibili.com</code>。</p>
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label>功能开关</label>
+          <div class="toggle-row">
+            <button class="toggle" id="shortsToggle" type="button" aria-label="开启或关闭短视频"></button>
+            <span class="toggle-label" id="shortsToggleLabel">已开启</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="shortsCount">显示条数（4 - 20）</label>
+          <input class="input" id="shortsCount" type="number" min="4" max="20" step="1">
+        </div>
+        <div class="field">
+          <label for="shortsDuration">短视频最长时长（秒）</label>
+          <input class="input" id="shortsDuration" type="number" min="30" max="3600" step="30">
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <span class="hint" style="margin:0">热门里不足 4 条满足时长时会放宽筛选，避免空白。</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="card-index">05</span>
+        <div>
+          <h2>界面信息</h2>
+          <p>显示在电视端左上角与浏览器标题。</p>
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="siteTitle">名称</label>
+          <input class="input" id="siteTitle" maxlength="24">
+        </div>
+        <div class="field">
+          <label for="siteSubtitle">副标题</label>
+          <input class="input" id="siteSubtitle" maxlength="30">
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <span class="card-index">06</span>
+        <div>
+          <h2>运行信息</h2>
+          <p id="runtimeInfo">正在读取…</p>
+        </div>
+      </div>
+      <p class="hint">
+        电视端使用浏览器全屏打开即可（F11 或电视浏览器全屏）。手机遥控地址为 <code id="remoteHint">/remote</code>。容器数据持久化在
+        <code>/data/config.json</code>，升级镜像不会丢失配置。
+      </p>
+    </section>
+
+    <footer class="page-footer">
+      FishTVBox 仅提供播放器与协议适配，不提供、不维护任何影视内容。所有直播源、电影源均由使用者自行配置，请遵守当地法律法规与内容服务条款。
+    </footer>
+  </div>
+
+  <div class="save-bar">
+    <span class="save-state" id="saveState">修改后点击保存</span>
+    <button class="solid-btn" id="saveBtn" type="button">保存配置</button>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="/js/settings.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+#EXTM3U catchup="append" catchup-source="?begin=${(b)yyyyMMddHHmmss}&end=${(e)yyyyMMddHHmmss}"
+#EXTINF:-1 tvg-id="demo-bunny" group-title="演示频道",演示 01 · 大雄兔
+https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
+#EXTINF:-1 tvg-id="demo-tos" group-title="演示频道",演示 02 · 钢铁之泪
+https://test-streams.mux.dev/tos_ismc/main.m3u8
+#EXTINF:-1 tvg-id="demo-bipbop" group-title="演示频道",演示 03 · Apple 测试流
+https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8
+#EXTINF:-1 tvg-id="demo-pts" group-title="演示频道",演示 04 · PTS 测试
+https://test-streams.mux.dev/pts_shift/master.m3u8
