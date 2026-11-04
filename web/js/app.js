@@ -32,8 +32,13 @@
     catchupDate: $('#catchupDate'),
     catchupHint: $('#catchupHint'),
     catchupList: $('#catchupList'),
+    homeChannelGrid: $('#homeChannelGrid'),
+    catchupView: $('#catchupView'),
+    catchupEntry: $('#catchupEntry'),
+    videoEntry: $('#videoEntry'),
+    btnCatchupHome: $('#btnCatchupHome'),
     categories: $('#categories'),
-    channelGrid: $('#channelGrid'),
+    channelGrid: $('#homeChannelGrid'),
     movieGrid: $('#movieGrid'),
     movieEmpty: $('#movieEmpty'),
     movieEmptyText: $('#movieEmptyText'),
@@ -63,6 +68,15 @@
     btnBiliRefresh: $('#btnBiliRefresh'),
     btnBiliHome: $('#btnBiliHome'),
     btnShortsEmptyRefresh: $('#btnShortsEmptyRefresh'),
+    movieEntry: $('#movieEntry'),
+    appsEntry: $('#appsEntry'),
+    remoteEntry: $('#remoteEntry'),
+    moviesView: $('#moviesView'),
+    appsView: $('#appsView'),
+    remoteView: $('#remoteView'),
+    btnMoviesHome: $('#btnMoviesHome'),
+    btnAppsHome: $('#btnAppsHome'),
+    btnRemoteHome: $('#btnRemoteHome'),
     overlay: $('#overlay'),
     overlayBody: $('#overlayBody'),
     overlayClose: $('#overlayClose'),
@@ -95,6 +109,10 @@
     fullscreenOpen: false,
     channelSwitchOpen: false,
     biliOpen: false,
+    moviesOpen: false,
+    appsOpen: false,
+    remoteOpen: false,
+    catchupOpen: false,
     digitBuffer: '',
     digitTimer: null,
     osdTimer: null,
@@ -188,6 +206,10 @@
     if (state.fullscreenOpen) return el.liveFullscreen;
     if (state.biliOpen) return el.biliView;
     if (state.overlayOpen) return el.overlayCard;
+    if (state.catchupOpen) return el.catchupView;
+    if (state.appsOpen) return el.appsView;
+    if (state.moviesOpen) return el.moviesView;
+    if (state.remoteOpen) return el.remoteView;
     return document;
   }
 
@@ -256,13 +278,13 @@
     if (best) focusNode(best);
   }
 
-  function focusFirst(selector) {
-    const node = $(selector);
+  function focusFirst(selector, root = navScope()) {
+    const node = $(selector, root);
     if (node) focusNode(node);
   }
 
   function focusFirstChannel() {
-    const node = $('.channel-card', el.channelGrid) || $('.poster-card', el.movieGrid) || $('.short-card', el.shortGrid);
+    const node = $('.quick-channel', el.homeChannelGrid) || el.stage;
     if (node) focusNode(node);
   }
 
@@ -296,27 +318,25 @@
     setLiveStatus('直播源加载中');
     el.iptvEmpty.hidden = true;
     if (!state.live) {
-      el.channelGrid.innerHTML = '<div class="skeleton" style="height:44px"></div>'.repeat(12);
+      el.homeChannelGrid.innerHTML = '<div class="skeleton" style="height:44px"></div>'.repeat(3);
     }
     try {
       const data = await api(`/api/iptv/channels${refresh ? '?refresh=1' : ''}`);
       state.live = data;
       renderLiveSource(data);
-      renderCategories(data);
       renderChannels();
 
       if (data.channels.length) {
         const keep = state.currentChannel && data.channels.find((c) => c.id === state.currentChannel.id);
         const target = keep || data.channels[0];
-        selectChannel(target, { play: false });
+        selectChannel(target, { play: true });
         setLiveStatus(`已加载 ${data.total} 个频道`, 'ok');
         if (!state.initialFocus) {
           state.initialFocus = true;
           focusFirstChannel();
         }
       } else {
-        el.channelGrid.innerHTML = '';
-        el.categories.innerHTML = '';
+        el.homeChannelGrid.innerHTML = '';
         el.iptvEmpty.hidden = false;
         el.iptvEmptyText.textContent =
           data.error || '请到电脑端配置页更换直播源地址，或使用带频道的 M3U / TXT 地址。';
@@ -326,8 +346,7 @@
       }
     } catch (error) {
       state.live = { ok: false, channels: [], categories: [], error: error.message };
-      el.channelGrid.innerHTML = '';
-      el.categories.innerHTML = '';
+      el.homeChannelGrid.innerHTML = '';
       el.iptvEmpty.hidden = false;
       el.iptvEmptyText.textContent = `直播源请求失败：${error.message}`;
       setLiveStatus('直播源不可用', 'bad');
@@ -345,65 +364,28 @@
     el.sourceFooter.textContent = `直播源：${name}`;
   }
 
-  function renderCategories(data) {
-    const categories = data.categories || [];
-    const total = data.channels.length;
-    el.categories.innerHTML = '';
-
-    const all = document.createElement('button');
-    all.className = `cat-pill${state.category === 'all' ? ' is-active' : ''}`;
-    all.dataset.nav = '';
-    all.textContent = `全部 ${total}`;
-    all.addEventListener('click', () => {
-      state.category = 'all';
-      renderCategories(data);
-      renderChannels();
-    });
-    el.categories.appendChild(all);
-
-    for (const category of categories) {
-      const button = document.createElement('button');
-      button.className = `cat-pill${state.category === category.name ? ' is-active' : ''}`;
-      button.dataset.nav = '';
-      button.textContent = `${category.name} ${category.channels.length}`;
-      button.addEventListener('click', () => {
-        state.category = category.name;
-        renderCategories(data);
-        renderChannels();
-      });
-      el.categories.appendChild(button);
-    }
-
-    if (state.category !== 'all' && !categories.some((category) => category.name === state.category)) {
-      state.category = 'all';
-    }
-  }
-
   function renderChannels() {
     if (!state.live) return;
-    const list =
-      state.category === 'all'
-        ? state.live.channels
-        : (state.live.categories.find((category) => category.name === state.category)?.channels || []);
+    const list = state.live.channels.slice(0, 3);
 
-    el.channelGrid.innerHTML = '';
+    el.homeChannelGrid.innerHTML = '';
     for (const channel of list) {
       const button = document.createElement('button');
-      button.className = `channel-card${state.currentChannel?.id === channel.id ? ' is-active' : ''}`;
+      button.className = `quick-channel${state.currentChannel?.id === channel.id ? ' is-active' : ''}`;
       button.dataset.nav = '';
       button.dataset.channelId = channel.id;
       button.setAttribute('aria-label', channel.name);
       const logo = channel.logo
         ? `<img src="${esc(imageUrl(channel.logo))}" alt="" loading="lazy">`
-        : esc(channel.name.slice(0, 1));
-      button.innerHTML = `<span class="ch-logo">${logo}</span><span class="ch-name">${esc(channel.name)}</span>`;
+        : esc(channel.name.slice(0, 2));
+      button.innerHTML = `<span class="quick-logo">${logo}</span><span class="quick-name">${esc(channel.name)}</span>`;
       const img = button.querySelector('img');
       if (img) img.addEventListener('error', () => img.remove());
       button.addEventListener('click', () => {
         selectChannel(channel, { play: false });
         openLiveFullscreen();
       });
-      el.channelGrid.appendChild(button);
+      el.homeChannelGrid.appendChild(button);
     }
   }
 
@@ -419,7 +401,7 @@
   function selectChannel(channel, { play = false } = {}) {
     if (!channel) return;
     state.currentChannel = channel;
-    $$('.channel-card', el.channelGrid).forEach((node) => {
+    $$('.quick-channel', el.homeChannelGrid).forEach((node) => {
       node.classList.toggle('is-active', node.dataset.channelId === channel.id);
     });
 
@@ -636,7 +618,7 @@
     el.nowBadge.textContent = 'LIVE';
     el.nowTitle.textContent = channel.name;
     el.nowProgram.textContent = '准备播放';
-    $$('.channel-card', el.channelGrid).forEach((node) => {
+    $$('.quick-channel', el.homeChannelGrid).forEach((node) => {
       node.classList.toggle('is-active', node.dataset.channelId === channel.id);
     });
     $$('.catchup-item.is-active').forEach((node) => node.classList.remove('is-active'));
@@ -669,6 +651,8 @@
     clearStreamError();
     loadMedia(el.tvVideo, program.url, 'tv');
     updateMuteLabel();
+    if (state.catchupOpen) closeCatchupView();
+    focusNode(el.stage);
   }
 
   function togglePlayback(video = el.tvVideo) {
@@ -715,7 +699,7 @@
     video.muted = false;
     video.volume = Math.min(1, Math.max(0, video.volume + delta));
     const percent = Math.round(video.volume * 100);
-    if (state.fullscreenOpen) showOsd(`${percent}%`, '音量');
+    if (state.fullscreenOpen) showVolumeOsd(percent);
     else toast(`音量 ${percent}%`);
   }
 
@@ -734,7 +718,7 @@
     const index = Math.max(0, list.findIndex((channel) => channel.id === state.currentChannel?.id));
     const next = list[(index + delta + list.length) % list.length];
     selectChannel(next, { play: true });
-    const node = $$('.channel-card', el.channelGrid).find((item) => item.dataset.channelId === next.id);
+    const node = $$('.quick-channel', el.homeChannelGrid).find((item) => item.dataset.channelId === next.id);
     if (node) focusNode(node);
   }
 
@@ -746,12 +730,22 @@
     return index >= 0 ? index + 1 : 0;
   }
 
-  function showOsd(main, sub = '', timeout = 1600) {
+  function showChannelOsd(text, timeout = 2200) {
     if (!el.fsOsd) return;
-    el.fsOsd.innerHTML = `${esc(main)}${sub ? `<small>${esc(sub)}</small>` : ''}`;
+    el.fsOsd.className = 'fs-osd is-channel';
+    el.fsOsd.textContent = String(text);
     el.fsOsd.hidden = false;
     clearTimeout(state.osdTimer);
     state.osdTimer = setTimeout(() => { el.fsOsd.hidden = true; }, timeout);
+  }
+
+  function showVolumeOsd(percent) {
+    if (!el.fsOsd) return;
+    el.fsOsd.className = 'fs-osd';
+    el.fsOsd.innerHTML = `${esc(percent)}%<small>音量</small>`;
+    el.fsOsd.hidden = false;
+    clearTimeout(state.osdTimer);
+    state.osdTimer = setTimeout(() => { el.fsOsd.hidden = true; }, 1400);
   }
 
   function resetFullscreenDim() {
@@ -789,7 +783,7 @@
     updateFullscreenInfo();
     loadMedia(el.fsVideo, state.currentChannel.url, 'fs');
     const num = String(channelNumber(state.currentChannel)).padStart(3, '0');
-    showOsd(num, state.currentChannel.name, 2200);
+    showChannelOsd(num);
     resetFullscreenDim();
   }
 
@@ -840,7 +834,7 @@
   function openChannelSwitcher() {
     if (!state.fullscreenOpen) return;
     if (!state.live?.channels?.length) {
-      showOsd('—', '暂无频道', 1200);
+      showChannelOsd('—', 1200);
       return;
     }
     state.channelSwitchOpen = true;
@@ -865,7 +859,7 @@
     clearTimeout(state.digitTimer);
     updateFullscreenInfo();
     loadMedia(el.fsVideo, channel.url, 'fs');
-    showOsd(String(channelNumber(channel)).padStart(3, '0'), channel.name, 2200);
+    showChannelOsd(String(channelNumber(channel)).padStart(3, '0'));
     if (!keepSwitcher) closeChannelSwitcher();
     resetFullscreenDim();
   }
@@ -882,7 +876,8 @@
     const list = state.live?.channels || [];
     const channel = list[number - 1];
     if (!channel) {
-      showOsd(String(number), '未找到该频道', 1600);
+      showChannelOsd(String(number), 1600);
+      toast('未找到该频道', true);
       return false;
     }
     switchFullscreenChannel(channel);
@@ -893,7 +888,7 @@
     if (!state.fullscreenOpen) return false;
     state.digitBuffer = `${state.digitBuffer}${digit}`.slice(-3);
     clearTimeout(state.digitTimer);
-    showOsd(state.digitBuffer, '输入频道号', 1400);
+    showChannelOsd(state.digitBuffer, 1400);
     state.digitTimer = setTimeout(() => {
       const number = Number(state.digitBuffer);
       state.digitBuffer = '';
@@ -915,7 +910,75 @@
     if (!state.biliOpen) return;
     state.biliOpen = false;
     el.biliView.hidden = true;
+    focusNode(state.appsOpen ? el.biliAppTile : el.appsEntry);
+  }
+
+  function openMoviesView() {
+    state.moviesOpen = true;
+    el.moviesView.hidden = false;
+    if (!state.movies.length) loadMovies();
+    const first = $('.poster-card', el.movieGrid);
+    if (first) focusNode(first);
+    else focusNode(el.btnMoviesHome);
+  }
+
+  function closeMoviesView() {
+    if (!state.moviesOpen) return;
+    state.moviesOpen = false;
+    el.moviesView.hidden = true;
+    focusNode(el.movieEntry);
+  }
+
+  function openAppsView() {
+    state.appsOpen = true;
+    el.appsView.hidden = false;
     focusNode(el.biliAppTile);
+  }
+
+  function closeAppsView() {
+    if (!state.appsOpen) return;
+    state.appsOpen = false;
+    el.appsView.hidden = true;
+    if (state.biliOpen) closeBiliView();
+    focusNode(el.appsEntry);
+  }
+
+  function openRemoteView() {
+    state.remoteOpen = true;
+    el.remoteView.hidden = false;
+    renderQrCode();
+    focusNode(el.btnRemoteHome);
+  }
+
+  function closeRemoteView() {
+    if (!state.remoteOpen) return;
+    state.remoteOpen = false;
+    el.remoteView.hidden = true;
+    focusNode(el.remoteEntry);
+  }
+
+  function openCatchupView() {
+    state.catchupOpen = true;
+    el.catchupView.hidden = false;
+    if (state.currentChannel) loadEpg(state.currentChannel);
+    const item = $('.catchup-item', el.catchupList);
+    if (item) focusNode(item);
+    else focusNode(el.btnCatchupHome);
+  }
+
+  function closeCatchupView() {
+    if (!state.catchupOpen) return;
+    state.catchupOpen = false;
+    el.catchupView.hidden = true;
+    focusNode(el.catchupEntry);
+  }
+
+  function closeAllViews() {
+    if (state.biliOpen) closeBiliView();
+    if (state.appsOpen) closeAppsView();
+    if (state.moviesOpen) closeMoviesView();
+    if (state.remoteOpen) closeRemoteView();
+    if (state.catchupOpen) closeCatchupView();
   }
 
   function renderQrCode() {
@@ -1372,6 +1435,22 @@
       closeOverlay();
       return;
     }
+    if (state.appsOpen) {
+      closeAppsView();
+      return;
+    }
+    if (state.catchupOpen) {
+      closeCatchupView();
+      return;
+    }
+    if (state.moviesOpen) {
+      closeMoviesView();
+      return;
+    }
+    if (state.remoteOpen) {
+      closeRemoteView();
+      return;
+    }
     if (el.stage.classList.contains('is-playing')) {
       stopLive();
       focusFirstChannel();
@@ -1458,7 +1537,8 @@
 
     if (state.biliOpen) {
       if (key === 'Home') {
-        closeBiliView();
+        closeAllViews();
+        focusFirstChannel();
         return true;
       }
       if (dirMap[key]) {
@@ -1472,6 +1552,42 @@
         return true;
       }
       return false;
+    }
+
+    if (state.appsOpen || state.moviesOpen || state.remoteOpen || state.catchupOpen) {
+      if (key === 'Home') {
+        closeAllViews();
+        focusFirstChannel();
+        return true;
+      }
+      if (dirMap[key]) {
+        moveFocus(dirMap[key]);
+        return true;
+      }
+      if (key === 'Enter' || key === ' ') {
+        const target = document.activeElement;
+        if (target && target.matches(NAV)) {
+          target.click();
+        } else {
+          const root = state.appsOpen
+            ? el.appsView
+            : state.moviesOpen
+              ? el.moviesView
+              : state.catchupOpen
+                ? el.catchupView
+                : el.remoteView;
+          focusFirst(NAV, root);
+        }
+        return true;
+      }
+      return false;
+    }
+
+    if (key === 'Home') {
+      closeAllViews();
+      if (state.currentChannel) playLive(state.currentChannel);
+      focusFirstChannel();
+      return true;
     }
 
     if (dirMap[key]) {
@@ -1574,34 +1690,37 @@
         closePlayerModal();
         closeOverlay(false);
         if (state.fullscreenOpen) closeLiveFullscreen();
-        if (state.biliOpen) closeBiliView();
+        closeAllViews();
         focusFirstChannel();
         break;
       case 'live':
         closePlayerModal();
         closeOverlay(false);
         if (state.fullscreenOpen) closeLiveFullscreen();
-        if (state.biliOpen) closeBiliView();
+        closeAllViews();
         focusFirstChannel();
         break;
       case 'movies':
         closePlayerModal();
         closeOverlay(false);
         if (state.fullscreenOpen) closeLiveFullscreen();
-        if (state.biliOpen) closeBiliView();
-        focusFirst($('.poster-card', el.movieGrid));
+        closeAllViews();
+        openMoviesView();
         break;
       case 'shorts':
         closePlayerModal();
         closeOverlay(false);
         if (state.fullscreenOpen) closeLiveFullscreen();
+        closeAllViews();
+        openAppsView();
         openBiliView();
         break;
       case 'apps':
         closePlayerModal();
         closeOverlay(false);
         if (state.fullscreenOpen) closeLiveFullscreen();
-        openBiliView();
+        closeAllViews();
+        openAppsView();
         break;
       case 'list':
       case 'ok':
@@ -1625,7 +1744,7 @@
       case 'menu':
         closePlayerModal();
         closeOverlay(false);
-        if (state.biliOpen) closeBiliView();
+        closeAllViews();
         openLiveFullscreen();
         break;
       case 'search':
@@ -1654,6 +1773,7 @@
         break;
       case 'settings':
         closePlayerModal();
+        closeAllViews();
         openGuide();
         break;
       case 'reload':
@@ -1759,17 +1879,19 @@
     $('#btnMovieEmptyGuide').addEventListener('click', openGuide);
     $('#btnShortsEmptyRefresh').addEventListener('click', () => loadShorts(true));
 
-    const baseUrl = () => {
-      const base = state.info?.addresses?.find((address) => !address.includes('127.0.0.1')) || state.info?.addresses?.[0] || location.origin;
-      return base;
-    };
+    el.movieEntry.addEventListener('click', openMoviesView);
+    el.videoEntry.addEventListener('click', openBiliView);
+    el.catchupEntry.addEventListener('click', openCatchupView);
+    el.btnCatchupHome.addEventListener('click', closeCatchupView);
+    el.appsEntry.addEventListener('click', openAppsView);
+    el.remoteEntry.addEventListener('click', openRemoteView);
+    el.btnMoviesHome.addEventListener('click', closeMoviesView);
+    el.btnAppsHome.addEventListener('click', closeAppsView);
+    el.btnRemoteHome.addEventListener('click', closeRemoteView);
 
     $('#biliAppTile')?.addEventListener('click', openBiliView);
     $('#searchAppTile')?.addEventListener('click', () => openSearchOverlay(''));
     $('#settingsAppTile')?.addEventListener('click', openGuide);
-    $('#remoteAppTile')?.addEventListener('click', () => {
-      window.open(`${baseUrl()}/remote`, '_blank');
-    });
     $('#btnBiliRefresh')?.addEventListener('click', () => loadShorts(true));
     $('#btnBiliHome')?.addEventListener('click', closeBiliView);
 

@@ -4588,3 +4588,622 @@ body.remote .remote-toast.bad {
     display: none;
   }
 }
+
+/* ============================================================
+   主页第三版：IPTV 直播大卡 + 名称/图片入口卡 + 内容页
+   ============================================================ */
+body.tv .launcher {
+  grid-template-columns: minmax(0, 2.15fr) minmax(290px, 1fr);
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+body.tv .iptv-panel {
+  grid-column: 1;
+  grid-row: 1 / 4;
+}
+
+body.tv .movies-entry {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+body.tv .apps-entry {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+body.tv .remote-entry {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+body.tv .entry-panel {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding: 0;
+  min-height: 0;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: #0b1830;
+  color: #fff;
+  text-align: left;
+  box-shadow: 0 16px 34px rgba(6, 28, 74, 0.28);
+}
+
+body.tv .entry-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+body.tv .entry-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(3, 10, 25, 0.88) 0%, rgba(3, 10, 25, 0.42) 58%, rgba(3, 10, 25, 0.12) 100%);
+}
+
+body.tv .entry-copy {
+  position: absolute;
+  left: 20px;
+  right: 64px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+body.tv .entry-kicker {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  color: rgba(188, 218, 252, 0.72);
+}
+
+body.tv .entry-copy h2 {
+  font-size: clamp(18px, 2.2vh, 26px);
+  font-weight: 750;
+  line-height: 1.15;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+body.tv .entry-copy p {
+  font-size: 10.5px;
+  color: rgba(216, 234, 252, 0.82);
+}
+
+body.tv .entry-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 22px;
+  line-height: 1;
+  color: #fff;
+}
+
+body.tv .entry-panel:hover .entry-cover {
+  transform: scale(1.04);
+}
+
+/* 电影 / 应用 / 手机控制内容页 */
+body.tv .movies-view,
+body.tv .apps-view,
+body.tv .remote-view {
+  position: fixed;
+  inset: 0;
+  z-index: 46;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 28px 26px;
+  color: #eaf4ff;
+  background:
+    radial-gradient(760px 420px at 88% -8%, rgba(120, 170, 255, 0.2), transparent 68%),
+    linear-gradient(160deg, #101a30 0%, #0a1222 58%, #070b16 100%);
+}
+
+body.tv .movies-view .poster-grid {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  padding: 0;
+}
+
+body.tv .apps-grid-big {
+  flex: 1;
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-content: center;
+}
+
+body.tv .apps-grid-big .app-tile {
+  min-height: clamp(130px, 22vh, 200px);
+  border-radius: 18px;
+}
+
+body.tv .apps-grid-big .app-icon {
+  width: 54px;
+  border-radius: 15px;
+}
+
+body.tv .apps-grid-big .app-name {
+  font-size: 16px;
+}
+
+body.tv .apps-grid-big .app-sub {
+  font-size: 11px;
+}
+
+body.tv .view-mark {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  color: #10243f;
+}
+
+body.tv .view-mark.films {
+  background: linear-gradient(135deg, #ffcf7d, #ff6a4d);
+}
+
+body.tv .view-mark.apps {
+  background: linear-gradient(135deg, #c7b4ff, #7d5cff);
+  color: #20104a;
+}
+
+body.tv .view-mark.remote {
+  background: linear-gradient(135deg, #8fe6ff, #2f8dff);
+  color: #082a52;
+}
+
+body.tv .remote-view {
+  color: #17304f;
+  background:
+    radial-gradient(520px 320px at 50% 0%, rgba(123, 188, 255, 0.35), transparent 68%),
+    linear-gradient(180deg, #f5f9fe 0%, #e8f1fb 100%);
+}
+
+body.tv .remote-view .app-view-title h2 {
+  color: #183a62;
+}
+
+body.tv .remote-view .app-view-title p {
+  color: #6d84a0;
+}
+
+body.tv .remote-view .mini-btn {
+  color: #2f66a4;
+  border-color: rgba(47, 126, 216, 0.2);
+  background: #fff;
+}
+
+body.tv .remote-view-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+body.tv .remote-view .qr-box {
+  width: min(40vh, 340px);
+  height: min(40vh, 340px);
+  padding: 14px;
+  border-radius: 20px;
+}
+
+body.tv .remote-scan {
+  font-size: clamp(15px, 2vh, 20px);
+  font-weight: 650;
+  color: #2c3a4f;
+}
+
+/* 节目列表：只占左半边，一频道一行 */
+body.tv .channel-switcher {
+  inset: 0 auto 0 0;
+  width: 50%;
+  padding: 24px 22px 26px;
+  background: linear-gradient(90deg, rgba(4, 10, 24, 0.95) 0%, rgba(4, 10, 24, 0.82) 82%, rgba(4, 10, 24, 0.55) 100%);
+}
+
+body.tv .cs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.tv .cs-item {
+  flex: none;
+  height: 52px;
+  width: 100%;
+}
+
+/* 换台数字：仅数字，左上角，放大，约占屏幕 1/8 */
+body.tv .fs-osd.is-channel {
+  left: 3vh;
+  top: 3vh;
+  transform: none;
+  width: 12.5vw;
+  height: 12.5vh;
+  min-width: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  color: #fff;
+  font-size: clamp(52px, 8.4vh, 150px);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 6px 28px rgba(0, 0, 0, 0.68), 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* 直播 / 回看 选项卡 */
+body.tv .iptv-tabs {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  padding: 6px 14px 4px;
+}
+
+body.tv .iptv-tab {
+  height: 30px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(220, 235, 255, 0.78);
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+body.tv .iptv-tab.is-active {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.92);
+  color: #173a62;
+}
+
+body.tv .iptv-page {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body.tv #catchupTab .catchup-strip {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body.tv #catchupTab .catchup-list {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 8px;
+  align-content: start;
+  overflow-y: auto;
+}
+
+body.tv #catchupTab .catchup-item {
+  width: auto;
+}
+
+@media (max-width: 900px) {
+  body.tv .launcher {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    overflow-y: auto;
+  }
+  body.tv .iptv-panel,
+  body.tv .movies-entry,
+  body.tv .apps-entry,
+  body.tv .remote-entry {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  body.tv .entry-panel {
+    min-height: 120px;
+  }
+}
+
+/* ============================================================
+   主页第四版：按参考图布局
+   ============================================================ */
+body.tv .launcher {
+  grid-template-columns: minmax(0, 2.3fr) minmax(260px, 1fr);
+  grid-template-rows: minmax(0, 2.15fr) minmax(112px, 0.72fr);
+  gap: 14px;
+}
+
+body.tv .iptv-panel {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+body.tv .iptv-panel .stage {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+
+body.tv .home-entries {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+body.tv .home-entry {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border: 1px solid #fff;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.93);
+  box-shadow: 0 14px 30px rgba(8, 33, 76, 0.2);
+  color: #173a62;
+  text-align: left;
+}
+
+body.tv .home-channels {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+}
+
+body.tv .home-channel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  min-height: 0;
+}
+
+body.tv .home-allapps {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid #fff;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.93);
+  box-shadow: 0 14px 30px rgba(8, 33, 76, 0.2);
+  color: #173a62;
+  text-align: left;
+}
+
+body.tv .entry-icon {
+  flex: none;
+  width: 54px;
+  height: 54px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+
+body.tv .entry-icon svg {
+  width: 29px;
+  height: 29px;
+}
+
+body.tv .entry-icon.catchup {
+  background: linear-gradient(135deg, #ffd083, #ff9a4d);
+  color: #4a2002;
+}
+
+body.tv .entry-icon.films {
+  background: linear-gradient(135deg, #ffb599, #ff6a4d);
+}
+
+body.tv .entry-icon.video {
+  background: linear-gradient(135deg, #ff9fbd, #ff5f8f);
+}
+
+body.tv .entry-icon.apps {
+  background: linear-gradient(135deg, #9fc3ff, #4d86ff);
+}
+
+body.tv .entry-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+body.tv .entry-label {
+  font-size: clamp(16px, 2.1vh, 24px);
+  font-weight: 750;
+  line-height: 1.2;
+  color: #173a62;
+}
+
+body.tv .entry-desc {
+  font-size: 10.5px;
+  color: #6d84a0;
+}
+
+body.tv .home-entry .entry-arrow,
+body.tv .home-allapps .entry-arrow {
+  position: static;
+  transform: none;
+  width: auto;
+  height: auto;
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: #9db4cc;
+  font-size: 22px;
+  line-height: 1;
+}
+
+body.tv .home-quick,
+body.tv .home-channel-grid .quick-channel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 0;
+  padding: 8px;
+  border: 1px solid #fff;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.93);
+  box-shadow: 0 10px 22px rgba(8, 33, 76, 0.16);
+  color: #173a62;
+}
+
+body.tv .home-quick .quick-logo,
+body.tv .home-channel-grid .quick-logo {
+  width: 54px;
+  height: 34px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #1f6fd4, #3aa0ff);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  overflow: hidden;
+}
+
+body.tv .home-quick .quick-logo svg {
+  width: 20px;
+  height: 20px;
+}
+
+body.tv .home-channel-grid .quick-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+body.tv .quick-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+body.tv .home-channel-grid .quick-channel.is-active {
+  outline: 3px solid rgba(47, 126, 216, 0.5);
+}
+
+/* 电视回放内容页 */
+body.tv .catchup-view {
+  position: fixed;
+  inset: 0;
+  z-index: 46;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 28px 26px;
+  color: #eaf4ff;
+  background:
+    radial-gradient(760px 420px at 88% -8%, rgba(255, 190, 120, 0.16), transparent 68%),
+    linear-gradient(160deg, #101a30 0%, #0a1222 58%, #070b16 100%);
+}
+
+body.tv .catchup-view .view-mark.catchup {
+  background: linear-gradient(135deg, #ffd083, #ff9a4d);
+  color: #4a2002;
+}
+
+body.tv .catchup-view-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+body.tv .catchup-view .catchup-head {
+  color: #eaf4ff;
+}
+
+body.tv .catchup-view .catchup-title {
+  color: #eaf4ff;
+}
+
+body.tv .catchup-view .catchup-hint {
+  color: rgba(200, 225, 255, 0.72);
+}
+
+body.tv .catchup-view .catchup-list {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  align-content: start;
+  overflow-y: auto;
+}
+
+body.tv .catchup-view .catchup-item {
+  width: auto;
+}
+
+@media (max-width: 900px) {
+  body.tv .launcher {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    overflow-y: auto;
+  }
+  body.tv .iptv-panel,
+  body.tv .home-entries,
+  body.tv .home-channels,
+  body.tv .home-allapps {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  body.tv .iptv-panel {
+    min-height: 260px;
+  }
+  body.tv .home-channel-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
