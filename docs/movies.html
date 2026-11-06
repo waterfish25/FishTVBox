@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2f7ed8">
+  <title>电影 · FishTVBox 演示</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/launcher.css">
+</head>
+<body class="tv">
+  <div class="movies-view">
+    <header class="app-view-head">
+      <div class="app-view-title">
+        <span class="view-mark films">FILM</span>
+        <div>
+          <h2>电影</h2>
+          <p>演示电影源 · 苹果 CMS 接口</p>
+        </div>
+      </div>
+      <div class="app-view-actions">
+        <button class="mini-btn" data-nav data-demo="演示站：实际电视端会打开搜索浮层">搜索</button>
+        <button class="mini-btn" data-nav data-demo="演示站：实际电视端会刷新电影列表">刷新</button>
+        <button class="mini-btn" data-nav data-back="index.html">返回主页</button>
+      </div>
+    </header>
+    <div class="poster-grid">
+      <button class="poster-card" data-nav data-demo="演示站：实际电视端会打开影片详情与选集">
+        <img src="assets/poster-1.jpg" alt="" loading="lazy">
+        <span class="poster-fallback">流浪地球 2</span>
+        <span class="poster-shade"></span>
+        <span class="poster-remark">HD 高清</span>
+        <span class="poster-meta">
+          <span class="poster-name">流浪地球 2</span>
+          <span class="poster-note">2023 · 科幻</span>
+        </span>
+      </button>
+      <button class="poster-card" data-nav data-demo="演示站：实际电视端会打开影片详情与选集">
+        <img src="assets/poster-2.jpg" alt="" loading="lazy">
+        <span class="poster-fallback">满江红</span>
+        <span class="poster-shade"></span>
+        <span class="poster-remark">更新至 30 集</span>
+        <span class="poster-meta">
+          <span class="poster-name">满江红</span>
+          <span class="poster-note">2023 · 剧情</span>
+        </span>
+      </button>
+      <button class="poster-card" data-nav data-demo="演示站：实际电视端会打开影片详情与选集">
+        <img src="assets/poster-3.jpg" alt="" loading="lazy">
+        <span class="poster-fallback">漫长的季节</span>
+        <span class="poster-shade"></span>
+        <span class="poster-remark">全 12 集</span>
+        <span class="poster-meta">
+          <span class="poster-name">漫长的季节</span>
+          <span class="poster-note">2023 · 悬疑</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <div class="demo-toast" id="demoToast" hidden></div>
+
+  <script src="assets/demo.js"></script>
+  <script>
+    (() => {
+      const { $, NAV, focusNode, moveFocus, bindKeys, bindDemoActions } = Demo;
+
+      function bind() {
+        bindDemoActions();
+        bindKeys(handleKey);
+        focusNode($('.poster-card'));
+      }
+
+      function handleKey(raw) {
+        const key = raw === 'OK' ? 'Enter' : raw;
+        if (key === 'Escape' || key === 'Back' || key === 'Home') {
+          location.href = 'index.html';
+          return true;
+        }
+        const dirMap = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+        if (dirMap[key]) { moveFocus(dirMap[key]); return true; }
+        if (key === 'Enter' || key === ' ') {
+          const target = document.activeElement;
+          if (target?.matches(NAV)) target.click();
+          else focusNode($('.poster-card'));
+          return true;
+        }
+        return false;
+      }
+
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+      else bind();
+    })();
+  </script>
+</body>
+</html>

@@ -226,11 +226,22 @@ async function handleApi(req, res, url) {
   return fail(res, 404, '接口不存在');
 }
 
+const PAGE_ROUTES = {
+  '/': 'index.html',
+  '/tv': 'index.html',
+  '/catchup': 'catchup.html',
+  '/movies': 'movies.html',
+  '/apps': 'apps.html',
+  '/bili': 'bili.html',
+  '/control': 'control.html',
+  '/settings': 'settings.html',
+  '/remote': 'remote.html',
+  '/favicon.ico': 'icon.svg',
+};
+
 function resolveStatic(pathname) {
-  if (pathname === '/' || pathname === '/tv') return path.join(WEB_DIR, 'index.html');
-  if (pathname === '/settings' || pathname === '/settings/') return path.join(WEB_DIR, 'settings.html');
-  if (pathname === '/remote' || pathname === '/remote/') return path.join(WEB_DIR, 'remote.html');
-  if (pathname === '/favicon.ico') return path.join(WEB_DIR, 'icon.svg');
+  const clean = pathname !== '/' && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+  if (PAGE_ROUTES[clean]) return path.join(WEB_DIR, PAGE_ROUTES[clean]);
 
   let relative;
   try {

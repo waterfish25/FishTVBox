@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2f7ed8">
+  <title>手机控制 · FishTVBox</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/vendor/qrcode.js" defer></script>
+  <script src="/js/tv-common.js" defer></script>
+  <script src="/js/control.js" defer></script>
+</head>
+<body class="tv">
+  <div class="remote-view" id="remoteView">
+    <header class="app-view-head">
+      <div class="app-view-title">
+        <span class="view-mark remote">QR</span>
+        <div>
+          <h2>手机控制</h2>
+          <p>扫描二维码即可控制电视</p>
+        </div>
+      </div>
+      <div class="app-view-actions">
+        <button class="mini-btn" data-nav id="btnRemoteHome">返回主页</button>
+      </div>
+    </header>
+    <div class="remote-view-body">
+      <div class="qr-box" id="qrCode" aria-label="手机遥控二维码"></div>
+      <p class="remote-scan">扫描二维码即可</p>
+      <p class="qr-url" id="qrUrl"></p>
+      <span class="qr-conn" id="qrConn"><i></i>遥控服务准备中</span>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+</body>
+</html>

@@ -3149,3 +3149,35 @@ body.tv .catchup-view .catchup-item {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* 独立回看页：频道选择条 */
+body.tv .catchup-channels {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 2px 8px;
+}
+
+body.tv .catchup-channels .quick-channel {
+  flex: 0 0 auto;
+  width: clamp(96px, 12vh, 130px);
+}
+
+/* 演示站共享提示条 */
+.demo-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 56px;
+  transform: translateX(-50%);
+  z-index: 60;
+  max-width: 76vw;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: rgba(8, 20, 42, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #eaf4ff;
+  font-size: 12px;
+  box-shadow: 0 14px 34px rgba(4, 18, 48, 0.4);
+}

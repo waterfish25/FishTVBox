@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2f7ed8">
+  <title>电视回放 · FishTVBox 演示</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/launcher.css">
+</head>
+<body class="tv">
+  <div class="catchup-view">
+    <header class="app-view-head">
+      <div class="app-view-title">
+        <span class="view-mark catchup">CLOCK</span>
+        <div>
+          <h2>电视回放</h2>
+          <p>今天节目单 · 选择节目回看</p>
+        </div>
+      </div>
+      <div class="app-view-actions">
+        <button class="mini-btn" data-nav data-back="index.html">返回主页</button>
+      </div>
+    </header>
+    <div class="catchup-view-body">
+      <div class="home-channel-grid catchup-channels">
+        <button class="quick-channel is-active" data-nav data-channel="0">
+          <span class="quick-logo">C1</span><span class="quick-name">CCTV-1 综合</span>
+        </button>
+        <button class="quick-channel" data-nav data-channel="1">
+          <span class="quick-logo">C5</span><span class="quick-name">CCTV-5 体育</span>
+        </button>
+        <button class="quick-channel" data-nav data-channel="2">
+          <span class="quick-logo">湖</span><span class="quick-name">湖南卫视</span>
+        </button>
+        <button class="quick-channel" data-nav data-channel="3">
+          <span class="quick-logo">东</span><span class="quick-name">东方卫视</span>
+        </button>
+      </div>
+      <div class="catchup-head">
+        <span class="catchup-title">今天回看</span>
+        <small id="catchupDate">11月06日</small>
+        <span class="catchup-hint" id="catchupHint">CCTV-1 综合 · 今日节目单 · 可回看</span>
+      </div>
+      <div class="catchup-list" id="catchupList">
+        <button class="catchup-item" data-nav data-demo="演示站：实际电视端会直接播放回看视频">
+          <span class="ci-time">08:00 - 09:00</span><span class="ci-title">朝闻天下</span>
+        </button>
+        <button class="catchup-item is-live" data-nav data-demo="演示站：实际电视端会直接播放回看视频">
+          <span class="ci-time">19:00 - 19:30</span><span class="ci-title">新闻联播（直播中）</span>
+        </button>
+        <button class="catchup-item" data-nav data-demo="演示站：实际电视端会直接播放回看视频">
+          <span class="ci-time">19:30 - 20:00</span><span class="ci-title">天气预报 · 焦点访谈</span>
+        </button>
+        <button class="catchup-item" data-nav data-demo="演示站：实际电视端会直接播放回看视频">
+          <span class="ci-time">20:00 - 21:50</span><span class="ci-title">电视剧 · 山河锦绣</span>
+        </button>
+        <button class="catchup-item" data-nav data-demo="演示站：实际电视端会直接播放回看视频">
+          <span class="ci-time">21:50 - 23:00</span><span class="ci-title">晚间新闻 · 今日关注</span>
+        </button>
+        <button class="catchup-item is-future">
+          <span class="ci-time">23:00 - 23:40</span><span class="ci-title">深夜剧场（未开始）</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-toast" id="demoToast" hidden></div>
+
+  <script src="assets/demo.js"></script>
+  <script>
+    (() => {
+      const { $, $$, NAV, toast, focusNode, moveFocus, bindKeys, bindDemoActions } = Demo;
+      const names = ['CCTV-1 综合', 'CCTV-5 体育', '湖南卫视', '东方卫视'];
+
+      function bind() {
+        $$('.catchup-channels .quick-channel').forEach((button, index) => {
+          button.addEventListener('click', () => {
+            $$('.catchup-channels .quick-channel').forEach((node) => node.classList.remove('is-active'));
+            button.classList.add('is-active');
+            $('#catchupHint').textContent = `${names[index]} · 今日节目单 · 可回看`;
+            toast(`演示站：已切换到 ${names[index]} 节目单`);
+          });
+        });
+        $$('.catchup-item[data-nav]').forEach((button) => {
+          button.addEventListener('click', () => {
+            $$('.catchup-item').forEach((node) => node.classList.remove('is-active'));
+            button.classList.add('is-active');
+          });
+        });
+        bindDemoActions();
+        bindKeys(handleKey);
+        focusNode($('.quick-channel', $('.catchup-channels')));
+      }
+
+      function handleKey(raw) {
+        const key = raw === 'OK' ? 'Enter' : raw;
+        if (key === 'Escape' || key === 'Back' || key === 'Home') {
+          location.href = 'index.html';
+          return true;
+        }
+        const dirMap = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+        if (dirMap[key]) { moveFocus(dirMap[key]); return true; }
+        if (key === 'Enter' || key === ' ') {
+          const target = document.activeElement;
+          if (target?.matches(NAV)) target.click();
+          else focusNode($('.quick-channel'));
+          return true;
+        }
+        return false;
+      }
+
+      Demo.clock();
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+      else bind();
+    })();
+  </script>
+</body>
+</html>

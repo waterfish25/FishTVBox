@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2f7ed8">
+  <title>手机控制 · FishTVBox 演示</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/launcher.css">
+</head>
+<body class="tv">
+  <div class="remote-view">
+    <header class="app-view-head">
+      <div class="app-view-title">
+        <span class="view-mark remote">QR</span>
+        <div>
+          <h2>手机控制</h2>
+          <p>扫描二维码即可控制电视</p>
+        </div>
+      </div>
+      <div class="app-view-actions">
+        <button class="mini-btn" data-nav data-back="index.html">返回主页</button>
+      </div>
+    </header>
+    <div class="remote-view-body">
+      <div class="qr-box" id="qrCode" aria-label="手机遥控二维码"></div>
+      <p class="remote-scan">扫描二维码即可</p>
+      <p class="qr-url" id="qrUrl"></p>
+      <span class="qr-conn"><i></i>演示二维码 · 打开手机遥控页</span>
+    </div>
+  </div>
+
+  <div class="demo-toast" id="demoToast" hidden></div>
+
+  <script src="assets/qrcode.js"></script>
+  <script src="assets/demo.js"></script>
+  <script>
+    (() => {
+      const { $, NAV, focusNode, bindKeys, bindDemoActions, renderQr } = Demo;
+
+      function bind() {
+        const url = new URL('remote.html', location.href).href;
+        $('#qrUrl').textContent = url;
+        renderQr('#qrCode', url);
+        bindDemoActions();
+        bindKeys(handleKey);
+        focusNode($('[data-back]'));
+      }
+
+      function handleKey(raw) {
+        const key = raw === 'OK' ? 'Enter' : raw;
+        if (key === 'Escape' || key === 'Back' || key === 'Home') {
+          location.href = 'index.html';
+          return true;
+        }
+        if (key === 'Enter' || key === ' ') {
+          const target = document.activeElement;
+          if (target?.matches(NAV)) target.click();
+          return true;
+        }
+        return false;
+      }
+
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+      else bind();
+    })();
+  </script>
+</body>
+</html>

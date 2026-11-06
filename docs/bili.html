@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2f7ed8">
+  <title>视频 · FishTVBox 演示</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/launcher.css">
+</head>
+<body class="tv">
+  <div class="bili-view">
+    <header class="app-view-head">
+      <div class="app-view-title">
+        <span class="bili-mark">B</span>
+        <div>
+          <h2>哔哩哔哩 · 热门</h2>
+          <p>方向键选择 · OK 播放 · 主页键返回主页</p>
+        </div>
+      </div>
+      <div class="app-view-actions">
+        <button class="mini-btn" data-nav data-demo="演示站：实际电视端会换一批热门视频">换一批</button>
+        <button class="mini-btn" data-nav data-back="index.html">返回主页</button>
+      </div>
+    </header>
+    <div class="short-grid bili-grid">
+      <button class="short-card" data-nav data-demo="演示站：实际电视端会内嵌播放 B 站视频">
+        <span class="short-thumb">
+          <img src="assets/poster-1.jpg" alt="" loading="lazy">
+          <span class="short-play">▶</span>
+          <span class="short-duration">02:31</span>
+        </span>
+        <span class="short-meta">
+          <span class="short-title">国产科幻片名场面混剪</span>
+          <span class="short-owner">影视飓风</span>
+        </span>
+      </button>
+      <button class="short-card" data-nav data-demo="演示站：实际电视端会内嵌播放 B 站视频">
+        <span class="short-thumb">
+          <img src="assets/poster-2.jpg" alt="" loading="lazy">
+          <span class="short-play">▶</span>
+          <span class="short-duration">05:12</span>
+        </span>
+        <span class="short-meta">
+          <span class="short-title">古装悬疑剧高燃剪辑</span>
+          <span class="short-owner">影视解说君</span>
+        </span>
+      </button>
+      <button class="short-card" data-nav data-demo="演示站：实际电视端会内嵌播放 B 站视频">
+        <span class="short-thumb">
+          <img src="assets/poster-3.jpg" alt="" loading="lazy">
+          <span class="short-play">▶</span>
+          <span class="short-duration">08:45</span>
+        </span>
+        <span class="short-meta">
+          <span class="short-title">年度悬疑剧深度解析</span>
+          <span class="short-owner">木鱼水心</span>
+        </span>
+      </button>
+      <button class="short-card" data-nav data-demo="演示站：实际电视端会内嵌播放 B 站视频">
+        <span class="short-thumb">
+          <img src="assets/cover-movies.jpg" alt="" loading="lazy">
+          <span class="short-play">▶</span>
+          <span class="short-duration">12:08</span>
+        </span>
+        <span class="short-meta">
+          <span class="short-title">家庭影院搭建全记录</span>
+          <span class="short-owner">硬核数码</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <div class="demo-toast" id="demoToast" hidden></div>
+
+  <script src="assets/demo.js"></script>
+  <script>
+    (() => {
+      const { $, NAV, focusNode, moveFocus, bindKeys, bindDemoActions } = Demo;
+
+      function bind() {
+        bindDemoActions();
+        bindKeys(handleKey);
+        focusNode($('.short-card'));
+      }
+
+      function handleKey(raw) {
+        const key = raw === 'OK' ? 'Enter' : raw;
+        if (key === 'Escape' || key === 'Back' || key === 'Home') {
+          location.href = 'index.html';
+          return true;
+        }
+        const dirMap = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+        if (dirMap[key]) { moveFocus(dirMap[key]); return true; }
+        if (key === 'Enter' || key === ' ') {
+          const target = document.activeElement;
+          if (target?.matches(NAV)) target.click();
+          else focusNode($('.short-card'));
+          return true;
+        }
+        return false;
+      }
+
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+      else bind();
+    })();
+  </script>
+</body>
+</html>

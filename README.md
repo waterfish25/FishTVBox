@@ -2,8 +2,7 @@
 
 把装有浏览器的电视 / 电视盒 / 平板变成 IPTV + 电影 + 短视频终端。单个 Docker 容器运行，电脑上完成配置，电视端直接使用，手机可当遥控器。
 
-- 在线演示（可直接访问）：<https://htmlpreview.github.io/?https://raw.githubusercontent.com/waterfish25/FishTVBox/main/docs/index.html>
-- 在线演示（GitHub Pages，启用后）：<https://waterfish25.github.io/FishTVBox/>
+- 在线演示（GitHub Pages）：<https://waterfish25.github.io/FishTVBox/>
 - 容器镜像：`ghcr.io/waterfish25/fishtvbox:latest`
 - 源码仓库：<https://github.com/waterfish25/FishTVBox>
 
@@ -121,7 +120,13 @@ node --check server/iptv.js
 node --check server/movies.js
 node --check server/bilibili.js
 node --check server/stream.js
-node --check web/js/app.js
+node --check web/js/tv-common.js
+node --check web/js/home.js
+node --check web/js/catchup.js
+node --check web/js/movies.js
+node --check web/js/apps.js
+node --check web/js/bili.js
+node --check web/js/control.js
 ```
 
 ## 目录结构

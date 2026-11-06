@@ -5207,3 +5207,18 @@ body.tv .catchup-view .catchup-item {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* 独立回看页：频道选择条 */
+body.tv .catchup-channels {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 2px 8px;
+}
+
+body.tv .catchup-channels .quick-channel {
+  flex: 0 0 auto;
+  width: clamp(96px, 12vh, 130px);
+}
